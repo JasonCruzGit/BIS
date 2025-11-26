@@ -187,375 +187,462 @@ export default function DashboardPage() {
 
   return (
     <Layout>
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
-            <p className="text-lg text-gray-600">
-              Welcome back, <span className="font-semibold text-primary-600">{user.firstName} {user.lastName}</span>!
-            </p>
-            {currentDate && (
-              <p className="mt-2 text-sm text-gray-500 flex items-center">
-                <Calendar className="h-4 w-4 mr-2" />
-                {currentDate}
-              </p>
-            )}
-          </div>
-          <div className="mt-4 sm:mt-0 flex flex-col items-end gap-2">
-            {currentTime && (
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-gray-600" />
-                <span className="font-mono font-bold text-lg text-gray-900">{currentTime}</span>
+      <div className="space-y-8 pb-8">
+        {/* Enhanced Header with Gradient Background */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-800 rounded-3xl shadow-2xl p-8 text-white">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+                  <Activity className="h-6 w-6 text-white" />
+                </div>
+                <h1 className="text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg">Dashboard</h1>
               </div>
-            )}
-            <div className="flex gap-3">
+              <p className="text-lg lg:text-xl text-white/90 mb-4">
+                Welcome back, <span className="font-bold text-white">{user.firstName} {user.lastName}</span>! 👋
+              </p>
+              {currentDate && (
+                <div className="flex items-center gap-4 flex-wrap">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+                    <Calendar className="h-4 w-4 text-white" />
+                    <span className="text-sm font-medium text-white">{currentDate}</span>
+                  </div>
+                  {currentTime && (
+                    <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+                      <Clock className="h-4 w-4 text-white" />
+                      <span className="font-mono font-bold text-base text-white">{currentTime}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
               <Link
                 href="/residents/new"
-                className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white text-primary-700 rounded-xl hover:bg-white/90 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 font-semibold group"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
                 Add Resident
               </Link>
               <Link
                 href="/documents/new"
-                className="inline-flex items-center px-5 py-2.5 bg-white text-gray-700 border-2 border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 rounded-xl hover:bg-white/20 hover:border-white/50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-semibold group"
               >
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
                 Issue Document
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Enhanced Stats Grid */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {statCards.map((stat, index) => {
             const Icon = stat.icon
             return (
               <Link
                 key={stat.label}
                 href={stat.link}
-                className="group relative bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 transform hover:-translate-y-1"
+                className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 transform hover:-translate-y-2 hover:scale-[1.02]"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                {/* Background gradient overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                {/* Animated gradient background */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgGradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+                
+                {/* Glowing effect */}
+                <div className={`absolute -inset-1 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500`} />
                 
                 <div className="relative p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-600 mb-2">{stat.label}</p>
-                      {statsLoading ? (
-                        <div className="h-10 w-24 bg-gray-200 rounded animate-pulse mb-2" />
-                      ) : (
-                        <p className="text-4xl font-bold text-gray-900 mb-3">{stat.value.toLocaleString()}</p>
-                      )}
-                      <div className="flex items-center text-xs">
-                        <TrendingUp className={`h-3.5 w-3.5 mr-1.5 ${stat.trendColor}`} />
-                        <span className={`font-semibold ${stat.trendColor}`}>{stat.trend}</span>
-                        <span className="ml-1.5 text-gray-500">vs last month</span>
+                  <div className="flex flex-col">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">{stat.label}</p>
+                        {statsLoading ? (
+                          <div className="h-12 w-32 bg-gray-200 rounded-lg animate-pulse mb-3" />
+                        ) : (
+                          <p className="text-5xl font-extrabold bg-gradient-to-br from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4 group-hover:scale-105 transition-transform duration-300">
+                            {stat.value.toLocaleString()}
+                          </p>
+                        )}
+                      </div>
+                      <div className={`${stat.iconBg} p-4 rounded-2xl shadow-xl group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 group-hover:shadow-2xl`}>
+                        <Icon className={`h-8 w-8 ${stat.iconColor}`} />
                       </div>
                     </div>
-                    <div className={`${stat.iconBg} p-4 rounded-2xl shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-                      <Icon className={`h-7 w-7 ${stat.iconColor}`} />
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                      <div className="flex items-center text-xs">
+                        <div className={`p-1.5 rounded-lg ${stat.trendColor.replace('text-', 'bg-').replace('-600', '-100')}`}>
+                          <TrendingUp className={`h-3.5 w-3.5 ${stat.trendColor}`} />
+                        </div>
+                        <span className={`ml-2 font-bold ${stat.trendColor}`}>{stat.trend}</span>
+                      </div>
+                      <span className="text-xs text-gray-400">vs last month</span>
                     </div>
                   </div>
                 </div>
                 
-                {/* Bottom accent bar */}
-                <div className={`h-1.5 bg-gradient-to-r ${stat.gradient} group-hover:h-2 transition-all duration-300`} />
+                {/* Animated bottom accent bar */}
+                <div className={`h-1 bg-gradient-to-r ${stat.gradient} group-hover:h-2 transition-all duration-500 relative overflow-hidden`}>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer" />
+                </div>
                 
                 {/* Shine effect on hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 </div>
               </Link>
             )
           })}
         </div>
 
-        {/* Charts Section */}
+        {/* Enhanced Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Activity Chart */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 flex items-center">
-                  <Activity className="h-5 w-5 mr-2 text-primary-600" />
-                  Activity Overview
-                </h2>
-                <p className="text-sm text-gray-500 mt-1.5">Last 6 months</p>
+          <div className="group relative bg-white rounded-3xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-500 overflow-hidden">
+            {/* Decorative gradient overlay */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b-2 border-gray-100">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2.5 bg-blue-100 rounded-xl">
+                      <Activity className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">Activity Overview</h2>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2 ml-12">Last 6 months performance</p>
+                </div>
               </div>
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#9ca3af" 
+                    fontSize={13}
+                    fontWeight={600}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={10}
+                  />
+                  <YAxis 
+                    stroke="#9ca3af" 
+                    fontSize={13}
+                    fontWeight={600}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={10}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#fff', 
+                      border: 'none',
+                      borderRadius: '16px',
+                      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                      padding: '16px',
+                      fontWeight: 600
+                    }}
+                    cursor={{ fill: 'rgba(59, 130, 246, 0.08)' }}
+                  />
+                  <Bar dataKey="residents" fill="#3b82f6" radius={[12, 12, 0, 0]} />
+                  <Bar dataKey="documents" fill="#f59e0b" radius={[12, 12, 0, 0]} />
+                  <Bar dataKey="incidents" fill="#ef4444" radius={[12, 12, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-            <ResponsiveContainer width="100%" height={320}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#6b7280" 
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis 
-                  stroke="#6b7280" 
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-                    padding: '12px'
-                  }}
-                  cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
-                />
-                <Bar dataKey="residents" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="documents" fill="#f59e0b" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="incidents" fill="#ef4444" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
           </div>
 
           {/* Distribution Chart */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 flex items-center">
-                  <TrendingUp className="h-5 w-5 mr-2 text-primary-600" />
-                  Data Distribution
-                </h2>
-                <p className="text-sm text-gray-500 mt-1.5">Current statistics</p>
+          <div className="group relative bg-white rounded-3xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-500 overflow-hidden">
+            {/* Decorative gradient overlay */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2" />
+            
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b-2 border-gray-100">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2.5 bg-purple-100 rounded-xl">
+                      <TrendingUp className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">Data Distribution</h2>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2 ml-12">Current statistics breakdown</p>
+                </div>
               </div>
+              <ResponsiveContainer width="100%" height={350}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={120}
+                    innerRadius={60}
+                    fill="#8884d8"
+                    dataKey="value"
+                    stroke="#fff"
+                    strokeWidth={3}
+                    paddingAngle={2}
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#fff', 
+                      border: 'none',
+                      borderRadius: '16px',
+                      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                      padding: '16px',
+                      fontWeight: 600
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
-            <ResponsiveContainer width="100%" height={320}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={110}
-                  fill="#8884d8"
-                  dataKey="value"
-                  stroke="#fff"
-                  strokeWidth={2}
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-                    padding: '12px'
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Recent Activity & Announcements */}
+        {/* Enhanced Recent Activity & Announcements */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Documents */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 flex items-center">
-                <div className="p-2 bg-blue-100 rounded-lg mr-3">
-                  <FileText className="h-5 w-5 text-blue-600" />
-                </div>
-                Recent Documents
-              </h2>
-              <Link href="/documents" className="text-sm font-medium text-primary-600 hover:text-primary-700 flex items-center group">
-                View all
-                <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {recentDocuments && recentDocuments.length > 0 ? (
-                recentDocuments.map((doc: any) => (
-                  <Link
-                    key={doc.id}
-                    href={`/documents/${doc.id}`}
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl hover:from-blue-50 hover:to-blue-100 border border-gray-100 hover:border-blue-200 transition-all duration-200 group"
-                  >
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-900">{doc.documentType.replace(/_/g, ' ')}</p>
-                      <p className="text-xs text-gray-500 mt-1 group-hover:text-blue-700">
-                        {doc.resident?.firstName} {doc.resident?.lastName}
-                      </p>
+          <div className="group relative bg-white rounded-3xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-500 overflow-hidden">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b-2 border-gray-100">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mr-4 shadow-lg">
+                    <FileText className="h-6 w-6 text-white" />
+                  </div>
+                  Recent Documents
+                </h2>
+                <Link href="/documents" className="text-sm font-semibold text-primary-600 hover:text-primary-700 flex items-center group px-4 py-2 rounded-lg hover:bg-primary-50 transition-all duration-200">
+                  View all
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
+              <div className="space-y-3">
+                {recentDocuments && recentDocuments.length > 0 ? (
+                  recentDocuments.map((doc: any) => (
+                    <Link
+                      key={doc.id}
+                      href={`/documents/${doc.id}`}
+                      className="flex items-center justify-between p-5 bg-gradient-to-r from-gray-50 to-white rounded-2xl hover:from-blue-50 hover:to-blue-100 border-2 border-gray-100 hover:border-blue-300 transition-all duration-300 group transform hover:-translate-y-1 hover:shadow-lg"
+                    >
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 group-hover:scale-110 transition-all duration-300">
+                          <FileText className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-bold text-gray-900 group-hover:text-blue-900 mb-1">{doc.documentType.replace(/_/g, ' ')}</p>
+                          <p className="text-xs text-gray-500 group-hover:text-blue-700">
+                            {doc.resident?.firstName} {doc.resident?.lastName}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-semibold text-gray-500 group-hover:text-blue-600">
+                          {format(new Date(doc.issuedDate), 'MMM d')}
+                        </p>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                      <FileText className="h-8 w-8 text-gray-300" />
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs font-medium text-gray-500 group-hover:text-blue-600">
-                        {format(new Date(doc.issuedDate), 'MMM d')}
-                      </p>
-                    </div>
-                  </Link>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">No recent documents</p>
-                </div>
-              )}
+                    <p className="text-sm font-medium text-gray-500">No recent documents</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Recent Incidents */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 flex items-center">
-                <div className="p-2 bg-red-100 rounded-lg mr-3">
-                  <AlertCircle className="h-5 w-5 text-red-600" />
-                </div>
-                Recent Incidents
-              </h2>
-              <Link href="/incidents" className="text-sm font-medium text-primary-600 hover:text-primary-700 flex items-center group">
-                View all
-                <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {recentIncidents && recentIncidents.length > 0 ? (
-                recentIncidents.map((incident: any) => (
-                  <Link
-                    key={incident.id}
-                    href={`/incidents/${incident.id}`}
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl hover:from-red-50 hover:to-red-100 border border-gray-100 hover:border-red-200 transition-all duration-200 group"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
-                          incident.status === 'RESOLVED' ? 'bg-green-100 text-green-800' :
-                          incident.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-blue-100 text-blue-800'
-                        }`}>
-                          {incident.status}
-                        </span>
+          <div className="group relative bg-white rounded-3xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-500 overflow-hidden">
+            <div className="absolute top-0 left-0 w-48 h-48 bg-red-500/5 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b-2 border-gray-100">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <div className="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl mr-4 shadow-lg">
+                    <AlertCircle className="h-6 w-6 text-white" />
+                  </div>
+                  Recent Incidents
+                </h2>
+                <Link href="/incidents" className="text-sm font-semibold text-primary-600 hover:text-primary-700 flex items-center group px-4 py-2 rounded-lg hover:bg-primary-50 transition-all duration-200">
+                  View all
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
+              <div className="space-y-3">
+                {recentIncidents && recentIncidents.length > 0 ? (
+                  recentIncidents.map((incident: any) => (
+                    <Link
+                      key={incident.id}
+                      href={`/incidents/${incident.id}`}
+                      className="flex items-center justify-between p-5 bg-gradient-to-r from-gray-50 to-white rounded-2xl hover:from-red-50 hover:to-red-100 border-2 border-gray-100 hover:border-red-300 transition-all duration-300 group transform hover:-translate-y-1 hover:shadow-lg"
+                    >
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="p-3 bg-red-100 rounded-xl group-hover:bg-red-200 group-hover:scale-110 transition-all duration-300">
+                          <AlertCircle className="h-5 w-5 text-red-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className={`px-3 py-1.5 text-xs font-bold rounded-full ${
+                              incident.status === 'RESOLVED' ? 'bg-green-100 text-green-800 border border-green-200' :
+                              incident.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+                              'bg-blue-100 text-blue-800 border border-blue-200'
+                            }`}>
+                              {incident.status}
+                            </span>
+                          </div>
+                          <p className="text-xs font-medium text-gray-500 group-hover:text-red-700">
+                            {incident.complainant?.firstName} {incident.complainant?.lastName}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-500 group-hover:text-red-700">
-                        {incident.complainant?.firstName} {incident.complainant?.lastName}
-                      </p>
+                      <div className="text-right">
+                        <p className="text-xs font-semibold text-gray-500 group-hover:text-red-600">
+                          {format(new Date(incident.incidentDate), 'MMM d')}
+                        </p>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                      <AlertCircle className="h-8 w-8 text-gray-300" />
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs font-medium text-gray-500 group-hover:text-red-600">
-                        {format(new Date(incident.incidentDate), 'MMM d')}
-                      </p>
-                    </div>
-                  </Link>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <AlertCircle className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">No recent incidents</p>
-                </div>
-              )}
+                    <p className="text-sm font-medium text-gray-500">No recent incidents</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Announcements */}
+        {/* Enhanced Announcements */}
         {announcements && announcements.length > 0 && (
-          <div className="bg-gradient-to-br from-primary-50 via-blue-50 to-indigo-50 rounded-2xl shadow-lg p-6 border border-primary-200">
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-primary-200">
-              <h2 className="text-xl font-bold text-gray-900 flex items-center">
-                <div className="p-2 bg-primary-600 rounded-lg mr-3">
-                  <Bell className="h-5 w-5 text-white" />
-                </div>
-                Announcements
-              </h2>
-              <Link href="/announcements" className="text-sm font-medium text-primary-600 hover:text-primary-700 flex items-center group">
-                View all
-                <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {announcements.slice(0, 3).map((announcement: any) => (
-                <div 
-                  key={announcement.id} 
-                  className="bg-white rounded-xl p-5 border-l-4 border-primary-500 shadow-md hover:shadow-lg transition-all duration-200 hover:border-primary-600"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-bold text-gray-900">{announcement.title}</h3>
-                        {announcement.isPinned && (
-                          <span className="px-2.5 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">
-                            📌 Pinned
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600 line-clamp-2 mb-3">{announcement.content}</p>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <div className="flex items-center">
-                          <Calendar className="h-3.5 w-3.5 mr-1.5" />
-                          {format(new Date(announcement.createdAt), 'MMM d, yyyy')}
+          <div className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-800 rounded-3xl shadow-2xl p-8 border border-primary-500">
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+            
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b-2 border-white/20">
+                <h2 className="text-2xl font-bold text-white flex items-center">
+                  <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl mr-4 shadow-lg">
+                    <Bell className="h-6 w-6 text-white" />
+                  </div>
+                  Announcements
+                </h2>
+                <Link href="/announcements" className="text-sm font-semibold text-white hover:text-white/90 flex items-center group px-4 py-2 rounded-lg hover:bg-white/10 transition-all duration-200 backdrop-blur-sm">
+                  View all
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
+              </div>
+              <div className="space-y-4">
+                {announcements.slice(0, 3).map((announcement: any) => (
+                  <div 
+                    key={announcement.id} 
+                    className="group bg-white/95 backdrop-blur-sm rounded-2xl p-6 border-l-4 border-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-yellow-400 hover:scale-[1.02] transform"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <h3 className="font-bold text-lg text-gray-900">{announcement.title}</h3>
+                          {announcement.isPinned && (
+                            <span className="px-3 py-1.5 text-xs font-bold bg-yellow-400 text-yellow-900 rounded-full shadow-md border border-yellow-500">
+                              📌 Pinned
+                            </span>
+                          )}
                         </div>
-                        <div className="flex items-center">
-                          <Clock className="h-3.5 w-3.5 mr-1.5" />
-                          {format(new Date(announcement.createdAt), 'h:mm a')}
+                        <p className="text-sm text-gray-700 line-clamp-2 mb-4 leading-relaxed">{announcement.content}</p>
+                        <div className="flex items-center gap-6 text-xs font-medium text-gray-600">
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg">
+                            <Calendar className="h-4 w-4" />
+                            {format(new Date(announcement.createdAt), 'MMM d, yyyy')}
+                          </div>
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg">
+                            <Clock className="h-4 w-4" />
+                            {format(new Date(announcement.createdAt), 'h:mm a')}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         )}
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-            <Activity className="h-5 w-5 mr-2 text-primary-600" />
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Link
-              href="/residents/new"
-              className="flex flex-col items-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl hover:from-blue-100 hover:to-blue-200 border-2 border-blue-200 hover:border-blue-300 transition-all duration-200 group transform hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div className="p-3 bg-blue-500 rounded-xl mb-3 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                <Users className="h-7 w-7 text-white" />
+        {/* Enhanced Quick Actions */}
+        <div className="relative bg-white rounded-3xl shadow-xl p-8 border border-gray-100 overflow-hidden">
+          {/* Decorative background */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary-500/5 to-indigo-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-3 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl shadow-lg">
+                <Activity className="h-6 w-6 text-white" />
               </div>
-              <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-700">Add Resident</span>
-            </Link>
-            <Link
-              href="/documents/new"
-              className="flex flex-col items-center p-6 bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl hover:from-amber-100 hover:to-amber-200 border-2 border-amber-200 hover:border-amber-300 transition-all duration-200 group transform hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div className="p-3 bg-amber-500 rounded-xl mb-3 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                <FileText className="h-7 w-7 text-white" />
-              </div>
-              <span className="text-sm font-semibold text-gray-700 group-hover:text-amber-700">Issue Document</span>
-            </Link>
-            <Link
-              href="/incidents/new"
-              className="flex flex-col items-center p-6 bg-gradient-to-br from-rose-50 to-rose-100 rounded-xl hover:from-rose-100 hover:to-rose-200 border-2 border-rose-200 hover:border-rose-300 transition-all duration-200 group transform hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div className="p-3 bg-rose-500 rounded-xl mb-3 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                <AlertCircle className="h-7 w-7 text-white" />
-              </div>
-              <span className="text-sm font-semibold text-gray-700 group-hover:text-rose-700">Report Incident</span>
-            </Link>
-            <Link
-              href="/announcements/new"
-              className="flex flex-col items-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl hover:from-purple-100 hover:to-purple-200 border-2 border-purple-200 hover:border-purple-300 transition-all duration-200 group transform hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div className="p-3 bg-purple-500 rounded-xl mb-3 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                <Bell className="h-7 w-7 text-white" />
-              </div>
-              <span className="text-sm font-semibold text-gray-700 group-hover:text-purple-700">New Announcement</span>
-            </Link>
+              <h2 className="text-2xl font-bold text-gray-900">Quick Actions</h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+              <Link
+                href="/residents/new"
+                className="group relative flex flex-col items-center p-8 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 rounded-2xl hover:from-blue-100 hover:via-blue-200 hover:to-blue-100 border-2 border-blue-200 hover:border-blue-400 transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10 p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-4 group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 shadow-xl">
+                  <Users className="h-8 w-8 text-white" />
+                </div>
+                <span className="relative z-10 text-sm font-bold text-gray-800 group-hover:text-blue-900">Add Resident</span>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+              </Link>
+              <Link
+                href="/documents/new"
+                className="group relative flex flex-col items-center p-8 bg-gradient-to-br from-amber-50 via-amber-100 to-amber-50 rounded-2xl hover:from-amber-100 hover:via-amber-200 hover:to-amber-100 border-2 border-amber-200 hover:border-amber-400 transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10 p-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl mb-4 group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 shadow-xl">
+                  <FileText className="h-8 w-8 text-white" />
+                </div>
+                <span className="relative z-10 text-sm font-bold text-gray-800 group-hover:text-amber-900">Issue Document</span>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-amber-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+              </Link>
+              <Link
+                href="/incidents/new"
+                className="group relative flex flex-col items-center p-8 bg-gradient-to-br from-rose-50 via-rose-100 to-rose-50 rounded-2xl hover:from-rose-100 hover:via-rose-200 hover:to-rose-100 border-2 border-rose-200 hover:border-rose-400 transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10 p-4 bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl mb-4 group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 shadow-xl">
+                  <AlertCircle className="h-8 w-8 text-white" />
+                </div>
+                <span className="relative z-10 text-sm font-bold text-gray-800 group-hover:text-rose-900">Report Incident</span>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-rose-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+              </Link>
+              <Link
+                href="/announcements/new"
+                className="group relative flex flex-col items-center p-8 bg-gradient-to-br from-purple-50 via-purple-100 to-purple-50 rounded-2xl hover:from-purple-100 hover:via-purple-200 hover:to-purple-100 border-2 border-purple-200 hover:border-purple-400 transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10 p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl mb-4 group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 shadow-xl">
+                  <Bell className="h-8 w-8 text-white" />
+                </div>
+                <span className="relative z-10 text-sm font-bold text-gray-800 group-hover:text-purple-900">New Announcement</span>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-purple-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+              </Link>
+            </div>
           </div>
         </div>
       </div>
