@@ -196,35 +196,35 @@ export default function DashboardPage() {
               Welcome back, <span className="font-semibold text-primary-600">{user.firstName} {user.lastName}</span>!
             </p>
             {currentDate && (
-              <div className="mt-2 flex items-center gap-4">
-                <p className="text-sm text-gray-500 flex items-center">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  {currentDate}
-                </p>
-                {currentTime && (
-                  <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg shadow-lg">
-                    <Clock className="h-4 w-4" />
-                    <span className="font-mono font-bold text-lg">{currentTime}</span>
-                  </div>
-                )}
-              </div>
+              <p className="mt-2 text-sm text-gray-500 flex items-center">
+                <Calendar className="h-4 w-4 mr-2" />
+                {currentDate}
+              </p>
             )}
           </div>
-          <div className="mt-4 sm:mt-0 flex gap-3">
-            <Link
-              href="/residents/new"
-              className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Resident
-            </Link>
-            <Link
-              href="/documents/new"
-              className="inline-flex items-center px-5 py-2.5 bg-white text-gray-700 border-2 border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 shadow-sm hover:shadow-md"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Issue Document
-            </Link>
+          <div className="mt-4 sm:mt-0 flex flex-col items-end gap-2">
+            {currentTime && (
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-gray-600" />
+                <span className="font-mono font-bold text-lg text-gray-900">{currentTime}</span>
+              </div>
+            )}
+            <div className="flex gap-3">
+              <Link
+                href="/residents/new"
+                className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Resident
+              </Link>
+              <Link
+                href="/documents/new"
+                className="inline-flex items-center px-5 py-2.5 bg-white text-gray-700 border-2 border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Issue Document
+              </Link>
+            </div>
           </div>
         </div>
 
