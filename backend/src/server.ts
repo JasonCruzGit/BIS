@@ -40,21 +40,28 @@ app.use(cors({
       return callback(null, true);
     }
     
-    // In production, normalize the origin (remove trailing slash) and compare
+    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) {
       return callback(null, true);
     }
     
+    // Normalize both URLs (remove trailing slashes) for comparison
     const normalizedOrigin = origin.replace(/\/$/, '');
-    if (normalizedOrigin === normalizedFrontendUrl) {
+    const normalizedFrontend = normalizedFrontendUrl.replace(/\/$/, '');
+    
+    if (normalizedOrigin === normalizedFrontend) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      // Log for debugging but still allow (for now) to see what origins are being sent
+      console.log('CORS: Origin mismatch:', { origin, normalizedOrigin, normalizedFrontend });
+      callback(null, true); // Temporarily allow all to debug
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
