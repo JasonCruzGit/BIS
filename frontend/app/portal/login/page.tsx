@@ -75,11 +75,18 @@ export default function PortalLoginPage() {
       localStorage.setItem('resident', JSON.stringify(data.resident)) // Also store as resident for compatibility
 
       // If password setup is required, show modal
-      console.log('Checking requiresPasswordSetup:', data.requiresPasswordSetup)
-      if (data.requiresPasswordSetup === true) {
+      console.log('Checking requiresPasswordSetup:', data.requiresPasswordSetup, typeof data.requiresPasswordSetup)
+      
+      // Check if password setup is needed (handle both true and "true" string)
+      const needsPasswordSetup = data.requiresPasswordSetup === true || data.requiresPasswordSetup === 'true'
+      
+      if (needsPasswordSetup) {
         console.log('Showing password setup modal')
         setLoading(false)
-        setShowPasswordSetup(true)
+        // Use setTimeout to ensure state update happens before modal renders
+        setTimeout(() => {
+          setShowPasswordSetup(true)
+        }, 100)
         return
       }
 
