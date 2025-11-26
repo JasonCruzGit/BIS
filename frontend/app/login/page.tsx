@@ -20,11 +20,15 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
+      console.log('🔐 Attempting login with:', { email })
       const { data } = await api.post('/auth/login', { email, password })
+      console.log('✅ Login successful:', data)
       setAuth(data.user, data.token)
       toast.success('Login successful')
       router.push('/dashboard')
     } catch (error: any) {
+      console.error('❌ Login error:', error)
+      console.error('❌ Error response:', error.response)
       toast.error(error.response?.data?.message || 'Login failed')
     } finally {
       setLoading(false)

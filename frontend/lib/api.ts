@@ -2,9 +2,10 @@ import axios from 'axios'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api'
 
-// Debug: Log API URL in development
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-  console.log('API URL:', API_URL)
+// Debug: Log API URL (always in browser)
+if (typeof window !== 'undefined') {
+  console.log('🔗 API URL:', API_URL)
+  console.log('🌍 Environment:', process.env.NODE_ENV)
 }
 
 const api = axios.create({
