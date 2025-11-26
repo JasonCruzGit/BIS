@@ -32,30 +32,24 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 // Normalize FRONTEND_URL to remove trailing slash for CORS matching
 const normalizedFrontendUrl = FRONTEND_URL.replace(/\/$/, '');
 
-// Middleware
+// Middleware - CORS configuration
+// For now, allow all origins to debug CORS issues
+// TODO: Restrict to specific frontend URL once confirmed
 app.use(cors({
   origin: (origin, callback) => {
-    // In development, allow all origins
-    if (process.env.NODE_ENV !== 'production') {
-      return callback(null, true);
-    }
-    
-    // Allow requests with no origin (like mobile apps or curl requests)
+    // Always allow requests with no origin (like mobile apps, curl, Postman)
     if (!origin) {
       return callback(null, true);
     }
     
-    // Normalize both URLs (remove trailing slashes) for comparison
-    const normalizedOrigin = origin.replace(/\/$/, '');
-    const normalizedFrontend = normalizedFrontendUrl.replace(/\/$/, '');
+    // Log the origin for debugging
+    console.log('CORS request from origin:', origin);
+    console.log('Expected FRONTEND_URL:', FRONTEND_URL);
+    console.log('NODE_ENV:', process.env.NODE_ENV);
     
-    if (normalizedOrigin === normalizedFrontend) {
-      callback(null, true);
-    } else {
-      // Log for debugging but still allow (for now) to see what origins are being sent
-      console.log('CORS: Origin mismatch:', { origin, normalizedOrigin, normalizedFrontend });
-      callback(null, true); // Temporarily allow all to debug
-    }
+    // For now, allow all origins to ensure it works
+    // TODO: Once we confirm the frontend URL, restrict to that specific origin
+    callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -108,7 +102,19 @@ try {
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
+  // Don't interfere with CORS errors - let CORS middleware handle them
+  if (err.message === 'Not allowed by CORS') {
+    console.error('CORS Error:', err.message);
+    return res.status(403).json({
+      message: 'CORS: Origin not allowed',
+      origin: req.headers.origin
+    });
+  }
+  
+  console.error('Error:', err.message);
+  if (err.stack) {
+    console.error(err.stack);
+  }
   res.status(err.status || 500).json({
     message: err.message || 'Internal server error',
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
