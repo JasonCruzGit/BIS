@@ -29,10 +29,29 @@ const prisma = new PrismaClient();
 
 const PORT = Number(process.env.PORT) || 5000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+// Normalize FRONTEND_URL to remove trailing slash for CORS matching
+const normalizedFrontendUrl = FRONTEND_URL.replace(/\/$/, '');
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? FRONTEND_URL : true,
+  origin: (origin, callback) => {
+    // In development, allow all origins
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // In production, normalize the origin (remove trailing slash) and compare
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    if (normalizedOrigin === normalizedFrontendUrl) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
