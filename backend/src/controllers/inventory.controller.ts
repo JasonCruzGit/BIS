@@ -39,7 +39,9 @@ export const getInventoryItems = async (req: AuthRequest, res: Response) => {
     // Filter low stock items if requested
     let filteredItems = items;
     if (lowStock === 'true') {
-      filteredItems = items.filter(item => item.quantity <= item.minStock);
+      filteredItems = items.filter(
+        (item: typeof items[number]) => item.quantity <= item.minStock
+      );
     }
 
     const total = await prisma.inventoryItem.count({ where });

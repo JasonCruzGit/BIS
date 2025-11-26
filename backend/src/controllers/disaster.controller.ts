@@ -251,7 +251,7 @@ export const exportBeneficiaryList = async (req: AuthRequest, res: Response) => 
     });
 
     if (format === 'xlsx') {
-      const data = beneficiaries.map(ben => ({
+      const data = beneficiaries.map((ben: typeof beneficiaries[number]) => ({
         'Date Distributed': ben.dateDistributed.toLocaleDateString(),
         'Resident': ben.resident ? `${ben.resident.firstName} ${ben.resident.lastName}` : '',
         'Household': ben.household ? ben.household.headName : '',

@@ -225,7 +225,7 @@ export const exportBlotterReport = async (req: AuthRequest, res: Response) => {
     });
 
     if (format === 'xlsx') {
-      const data = entries.map(entry => ({
+      const data = entries.map((entry: typeof entries[number]) => ({
         'Entry Number': entry.entryNumber,
         'Date': entry.incidentDate.toLocaleDateString(),
         'Resident': `${entry.resident.firstName} ${entry.resident.lastName}`,

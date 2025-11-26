@@ -229,7 +229,7 @@ export const getFinancialSummary = async (req: AuthRequest, res: Response) => {
       byCategory: {} as Record<string, number>
     };
 
-    records.forEach(record => {
+    records.forEach((record: typeof records[number]) => {
       const amount = Number(record.amount);
       if (record.type === 'BUDGET') summary.totalBudget += amount;
       if (record.type === 'EXPENSE') summary.totalExpenses += amount;
@@ -268,7 +268,7 @@ export const exportFinancialReport = async (req: AuthRequest, res: Response) => 
     });
 
     if (format === 'xlsx') {
-      const data = records.map(record => ({
+      const data = records.map((record: typeof records[number]) => ({
         'Record Number': record.recordNumber,
         'Date': record.date.toLocaleDateString(),
         'Type': record.type,

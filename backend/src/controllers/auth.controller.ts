@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest, createAuditLog } from '../middleware/auth.middleware';
 
@@ -37,10 +37,19 @@ export const login = async (req: Request, res: Response) => {
     // Create audit log
     await createAuditLog(user.id, 'LOGIN', 'USER', user.id, null, req);
 
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not configured');
+    }
+
+    const signOptions: SignOptions = {
+      expiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
+    };
+
     const token = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      jwtSecret,
+      signOptions
     );
 
     res.json({
