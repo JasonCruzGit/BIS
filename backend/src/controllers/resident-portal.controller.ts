@@ -38,6 +38,13 @@ export const residentLogin = async (req: Request, res: Response) => {
 
     // Check if resident has a password set
     const hasPassword = !!resident.password;
+    
+    // Debug logging
+    console.log('Resident login check:', {
+      residentId: resident.id,
+      hasPassword,
+      passwordField: resident.password ? 'exists' : 'null/undefined'
+    });
 
     // If password is set, require password for login
     if (hasPassword) {
@@ -83,7 +90,7 @@ export const residentLogin = async (req: Request, res: Response) => {
       { expiresIn: '30d' }
     );
 
-    res.json({
+    const response = {
       token,
       resident: {
         id: resident.id,
@@ -93,7 +100,16 @@ export const residentLogin = async (req: Request, res: Response) => {
         address: resident.address,
       },
       requiresPasswordSetup: !hasPassword, // Flag to indicate if password needs to be set
+    };
+    
+    // Debug logging
+    console.log('Login response:', {
+      residentId: resident.id,
+      requiresPasswordSetup: response.requiresPasswordSetup,
+      hasPassword
     });
+    
+    res.json(response);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }

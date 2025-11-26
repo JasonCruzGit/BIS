@@ -45,6 +45,10 @@ export default function PortalLoginPage() {
 
       const data = await response.json()
 
+      // Debug logging
+      console.log('Login response:', data)
+      console.log('requiresPasswordSetup:', data.requiresPasswordSetup)
+
       if (!response.ok) {
         // If password is required but not provided, switch to password mode
         if (data.requiresPassword && !usePassword) {
@@ -71,7 +75,9 @@ export default function PortalLoginPage() {
       localStorage.setItem('resident', JSON.stringify(data.resident)) // Also store as resident for compatibility
 
       // If password setup is required, show modal
-      if (data.requiresPasswordSetup) {
+      console.log('Checking requiresPasswordSetup:', data.requiresPasswordSetup)
+      if (data.requiresPasswordSetup === true) {
+        console.log('Showing password setup modal')
         setLoading(false)
         setShowPasswordSetup(true)
         return
