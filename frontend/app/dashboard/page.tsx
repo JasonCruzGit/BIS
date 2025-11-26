@@ -28,13 +28,26 @@ export default function DashboardPage() {
   const router = useRouter()
   const { user, hydrated } = useAuthStore()
   const [currentDate, setCurrentDate] = useState<string>('')
+  const [currentTime, setCurrentTime] = useState<string>('')
 
   useEffect(() => {
     if (hydrated && !user) {
       router.push('/login')
     }
     if (typeof window !== 'undefined') {
-      setCurrentDate(format(new Date(), 'EEEE, MMMM d, yyyy'))
+      const updateDateTime = () => {
+        const now = new Date()
+        setCurrentDate(format(now, 'EEEE, MMMM d, yyyy'))
+        setCurrentTime(format(now, 'hh:mm:ss a'))
+      }
+      
+      // Update immediately
+      updateDateTime()
+      
+      // Update every second
+      const interval = setInterval(updateDateTime, 1000)
+      
+      return () => clearInterval(interval)
     }
   }, [user, router, hydrated])
 
@@ -183,10 +196,18 @@ export default function DashboardPage() {
               Welcome back, <span className="font-semibold text-primary-600">{user.firstName} {user.lastName}</span>!
             </p>
             {currentDate && (
-              <p className="mt-2 text-sm text-gray-500 flex items-center">
-                <Calendar className="h-4 w-4 mr-2" />
-                {currentDate}
-              </p>
+              <div className="mt-2 flex items-center gap-4">
+                <p className="text-sm text-gray-500 flex items-center">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  {currentDate}
+                </p>
+                {currentTime && (
+                  <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg shadow-lg">
+                    <Clock className="h-4 w-4" />
+                    <span className="font-mono font-bold text-lg">{currentTime}</span>
+                  </div>
+                )}
+              </div>
             )}
           </div>
           <div className="mt-4 sm:mt-0 flex gap-3">
