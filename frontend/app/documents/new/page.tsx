@@ -153,8 +153,8 @@ export default function NewDocumentPage() {
         : defaultTemplate
       
       return {
-        ...prev,
-        documentType: type,
+      ...prev,
+      documentType: type,
         template,
       }
     })
