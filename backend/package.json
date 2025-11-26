@@ -11,6 +11,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "create-admin": "tsx scripts/create-admin.ts",
+    "reset-admin": "tsx scripts/reset-admin-password.ts",
     "test": "jest"
   },
   "dependencies": {
