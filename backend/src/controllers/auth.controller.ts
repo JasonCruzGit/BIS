@@ -42,8 +42,12 @@ export const login = async (req: Request, res: Response) => {
       throw new Error('JWT_SECRET is not configured');
     }
 
+    const expiresInEnv = process.env.JWT_EXPIRES_IN ?? '7d';
+    const expiresIn: SignOptions['expiresIn'] =
+      /^\d+$/.test(expiresInEnv) ? Number(expiresInEnv) : (expiresInEnv as SignOptions['expiresIn']);
+
     const signOptions: SignOptions = {
-      expiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
+      expiresIn,
     };
 
     const token = jwt.sign(
