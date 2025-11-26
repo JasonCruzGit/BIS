@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   residentLogin,
+  setResidentPassword,
   getMyDocuments,
   getMyRequests,
   createDocumentRequest,
@@ -22,6 +23,7 @@ router.get('/document-types', getDocumentTypes);
 // Protected routes (require resident authentication)
 router.use(authenticateResident);
 
+router.put('/password', setResidentPassword);
 router.get('/documents', getMyDocuments);
 router.get('/requests', getMyRequests);
 router.get('/requests/:id', getRequestDetails);

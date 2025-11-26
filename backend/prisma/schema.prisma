@@ -42,6 +42,7 @@ model Resident {
   civilStatus           String                @map("civil_status")
   address               String
   contactNo             String                @map("contact_no")
+  password              String?               @map("password")
   occupation            String?
   education             String?
   idPhoto               String?               @map("id_photo")

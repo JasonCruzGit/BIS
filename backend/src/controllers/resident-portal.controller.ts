@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import { generateCertificatePDF } from '../utils/pdfGenerator';
 import path from 'path';
 import fs from 'fs';
@@ -17,22 +18,62 @@ const generateRequestNumber = () => {
 // Resident login/verification
 export const residentLogin = async (req: Request, res: Response) => {
   try {
-    const { contactNo, dateOfBirth } = req.body;
+    const { contactNo, dateOfBirth, password } = req.body;
 
-    if (!contactNo || !dateOfBirth) {
-      return res.status(400).json({ message: 'Contact number and date of birth are required' });
+    if (!contactNo) {
+      return res.status(400).json({ message: 'Contact number is required' });
     }
 
+    // Find resident by contact number
     const resident = await prisma.resident.findFirst({
       where: {
         contactNo,
-        dateOfBirth: new Date(dateOfBirth),
         isArchived: false,
       },
     });
 
     if (!resident) {
       return res.status(401).json({ message: 'Invalid credentials or resident not found' });
+    }
+
+    // Check if resident has a password set
+    const hasPassword = !!resident.password;
+
+    // If password is set, require password for login
+    if (hasPassword) {
+      if (!password) {
+        return res.status(400).json({ 
+          message: 'Password is required',
+          requiresPassword: true 
+        });
+      }
+
+      // Verify password
+      const isValidPassword = await bcrypt.compare(password, resident.password!);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: 'Invalid password' });
+      }
+    } else {
+      // If no password is set, require date of birth for initial login
+      if (!dateOfBirth) {
+        return res.status(400).json({ 
+          message: 'Date of birth is required for first-time login',
+          requiresPassword: false 
+        });
+      }
+
+      // Verify date of birth
+      const residentDob = new Date(resident.dateOfBirth);
+      const providedDob = new Date(dateOfBirth);
+      
+      // Compare dates (ignore time)
+      if (
+        residentDob.getFullYear() !== providedDob.getFullYear() ||
+        residentDob.getMonth() !== providedDob.getMonth() ||
+        residentDob.getDate() !== providedDob.getDate()
+      ) {
+        return res.status(401).json({ message: 'Invalid date of birth' });
+      }
     }
 
     // Generate token for resident session
@@ -51,7 +92,51 @@ export const residentLogin = async (req: Request, res: Response) => {
         contactNo: resident.contactNo,
         address: resident.address,
       },
+      requiresPasswordSetup: !hasPassword, // Flag to indicate if password needs to be set
     });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Set password for resident (after initial login)
+export const setResidentPassword = async (req: Request, res: Response) => {
+  try {
+    const residentId = (req as any).residentId;
+    const { password, confirmPassword } = req.body;
+
+    if (!password || !confirmPassword) {
+      return res.status(400).json({ message: 'Password and confirmation are required' });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: 'Passwords do not match' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+    }
+
+    // Get resident to check if password is already set
+    const resident = await prisma.resident.findUnique({
+      where: { id: residentId },
+      select: { id: true, password: true },
+    });
+
+    if (!resident) {
+      return res.status(404).json({ message: 'Resident not found' });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update resident with password
+    await prisma.resident.update({
+      where: { id: residentId },
+      data: { password: hashedPassword },
+    });
+
+    res.json({ message: 'Password set successfully' });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
