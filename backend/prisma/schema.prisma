@@ -1,0 +1,452 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String            @id @default(uuid())
+  email            String            @unique
+  password         String
+  firstName        String            @map("first_name")
+  lastName         String            @map("last_name")
+  role             UserRole          @default(STAFF)
+  isActive         Boolean           @default(true) @map("is_active")
+  lastLogin        DateTime?         @map("last_login")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  announcements    Announcement[]
+  auditLogs        AuditLog[]
+  blotterEntries   BlotterEntry[]
+  documents        Document[]
+  documentRequests DocumentRequest[]
+  financialRecords FinancialRecord[]
+  incidents        Incident[]
+  inventoryLogs    InventoryLog[]
+  projects         Project[]
+
+  @@map("users")
+}
+
+model Resident {
+  id                    String                @id @default(uuid())
+  firstName             String                @map("first_name")
+  middleName            String?               @map("middle_name")
+  lastName              String                @map("last_name")
+  suffix                String?
+  dateOfBirth           DateTime              @map("date_of_birth")
+  sex                   String
+  civilStatus           String                @map("civil_status")
+  address               String
+  contactNo             String                @map("contact_no")
+  occupation            String?
+  education             String?
+  idPhoto               String?               @map("id_photo")
+  residencyStatus       ResidencyStatus       @default(NEW) @map("residency_status")
+  householdId           String?               @map("household_id")
+  isArchived            Boolean               @default(false) @map("is_archived")
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+  blotterEntries        BlotterEntry[]
+  disasterBeneficiaries DisasterBeneficiary[]
+  documents             Document[]
+  documentRequests      DocumentRequest[]
+  incidents             Incident[]            @relation("Complainant")
+  incidentRespondents   Incident[]            @relation("Respondent")
+  household             Household?            @relation(fields: [householdId], references: [id])
+
+  @@index([householdId])
+  @@index([firstName, lastName])
+  @@map("residents")
+}
+
+model Household {
+  id                    String                @id @default(uuid())
+  householdNumber       String                @unique @map("household_number")
+  headName              String                @map("head_name")
+  address               String
+  latitude              Float?
+  longitude             Float?
+  income                Decimal?              @db.Decimal(12, 2)
+  livingConditions      String?               @map("living_conditions")
+  householdSize         Int                   @default(1) @map("household_size")
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+  disasterBeneficiaries DisasterBeneficiary[]
+  residents             Resident[]
+
+  @@map("households")
+}
+
+model Document {
+  id             String       @id @default(uuid())
+  documentNumber String       @unique @map("document_number")
+  documentType   DocumentType @map("document_type")
+  residentId     String       @map("resident_id")
+  issuedBy       String       @map("issued_by")
+  issuedDate     DateTime     @default(now()) @map("issued_date")
+  purpose        String?
+  template       String?
+  filePath       String?      @map("file_path")
+  requestId      String?      @unique @map("request_id")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  issuer         User         @relation(fields: [issuedBy], references: [id])
+  resident       Resident     @relation(fields: [residentId], references: [id])
+  request        DocumentRequest? @relation(fields: [requestId], references: [id])
+
+  @@index([residentId])
+  @@index([documentType])
+  @@map("documents")
+}
+
+// Document Request from Residents
+model DocumentRequest {
+  id             String            @id @default(uuid())
+  requestNumber String            @unique @map("request_number")
+  residentId    String            @map("resident_id")
+  documentType  DocumentType      @map("document_type")
+  purpose       String?           @db.Text
+  status        DocumentRequestStatus @default(PENDING)
+  fee           Decimal?          @db.Decimal(10, 2)
+  paymentStatus PaymentStatus     @default(UNPAID) @map("payment_status")
+  paymentMethod String?           @map("payment_method")
+  paymentReference String?        @map("payment_reference")
+  notes         String?           @db.Text
+  rejectedReason String?          @db.Text @map("rejected_reason")
+  processedBy   String?           @map("processed_by")
+  processedAt   DateTime?         @map("processed_at")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  resident  Resident  @relation(fields: [residentId], references: [id])
+  processor User?     @relation(fields: [processedBy], references: [id])
+  document  Document?
+
+  @@index([residentId])
+  @@index([status])
+  @@index([requestNumber])
+  @@map("document_requests")
+}
+
+enum DocumentRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Incident {
+  id             String         @id @default(uuid())
+  incidentNumber String         @unique @map("incident_number")
+  complainantId  String         @map("complainant_id")
+  respondentId   String?        @map("respondent_id")
+  narrative      String
+  incidentDate   DateTime       @map("incident_date")
+  actionsTaken   String?        @map("actions_taken")
+  status         IncidentStatus @default(PENDING)
+  hearingDate    DateTime?      @map("hearing_date")
+  attachments    String[]       @default([])
+  createdBy      String         @map("created_by")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  complainant    Resident       @relation("Complainant", fields: [complainantId], references: [id])
+  creator        User           @relation(fields: [createdBy], references: [id])
+  respondent     Resident?      @relation("Respondent", fields: [respondentId], references: [id])
+
+  @@index([complainantId])
+  @@index([status])
+  @@map("incidents")
+}
+
+model Project {
+  id             String        @id @default(uuid())
+  title          String
+  description    String
+  budget         Decimal       @db.Decimal(12, 2)
+  contractor     String?
+  startDate      DateTime      @map("start_date")
+  endDate        DateTime?     @map("end_date")
+  status         ProjectStatus @default(PLANNING)
+  documents      String[]      @default([])
+  progressPhotos String[]      @default([]) @map("progress_photos")
+  createdBy      String        @map("created_by")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  creator        User          @relation(fields: [createdBy], references: [id])
+
+  @@index([status])
+  @@map("projects")
+}
+
+model Official {
+  id         String       @id @default(uuid())
+  firstName  String       @map("first_name")
+  lastName   String       @map("last_name")
+  position   String
+  termStart  DateTime     @map("term_start")
+  termEnd    DateTime?    @map("term_end")
+  contactNo  String       @map("contact_no")
+  email      String?
+  photo      String?
+  documents  String[]     @default([])
+  isActive   Boolean      @default(true) @map("is_active")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  attendance Attendance[]
+
+  @@map("officials")
+}
+
+model Attendance {
+  id         String    @id @default(uuid())
+  officialId String    @map("official_id")
+  date       DateTime
+  timeIn     DateTime? @map("time_in")
+  timeOut    DateTime? @map("time_out")
+  remarks    String?
+  createdAt  DateTime  @default(now()) @map("created_at")
+  official   Official  @relation(fields: [officialId], references: [id])
+
+  @@index([officialId, date])
+  @@map("attendance")
+}
+
+model BlotterEntry {
+  id           String          @id @default(uuid())
+  entryNumber  String          @unique @map("entry_number")
+  residentId   String          @map("resident_id")
+  category     BlotterCategory
+  narrative    String
+  incidentDate DateTime        @map("incident_date")
+  status       BlotterStatus   @default(OPEN)
+  actionsTaken String?         @map("actions_taken")
+  createdBy    String          @map("created_by")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  creator      User            @relation(fields: [createdBy], references: [id])
+  resident     Resident        @relation(fields: [residentId], references: [id])
+
+  @@index([residentId])
+  @@index([category])
+  @@index([status])
+  @@map("blotter_entries")
+}
+
+model FinancialRecord {
+  id           String        @id @default(uuid())
+  recordNumber String        @unique @map("record_number")
+  type         FinancialType
+  category     String
+  description  String
+  amount       Decimal       @db.Decimal(12, 2)
+  date         DateTime
+  receiptPath  String?       @map("receipt_path")
+  createdBy    String        @map("created_by")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  creator      User          @relation(fields: [createdBy], references: [id])
+
+  @@index([type])
+  @@index([date])
+  @@map("financial_records")
+}
+
+model Announcement {
+  id          String           @id @default(uuid())
+  title       String
+  content     String
+  type        AnnouncementType @default(GENERAL)
+  isPinned    Boolean          @default(false) @map("is_pinned")
+  attachments String[]         @default([])
+  startDate   DateTime?        @map("start_date")
+  endDate     DateTime?        @map("end_date")
+  createdBy   String           @map("created_by")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  creator     User             @relation(fields: [createdBy], references: [id])
+
+  @@index([isPinned, createdAt])
+  @@map("announcements")
+}
+
+model Disaster {
+  id            String                @id @default(uuid())
+  name          String
+  type          String
+  date          DateTime
+  description   String
+  affectedAreas String[]              @default([]) @map("affected_areas")
+  status        DisasterStatus        @default(ACTIVE)
+  createdAt     DateTime              @default(now()) @map("created_at")
+  updatedAt     DateTime              @updatedAt @map("updated_at")
+  beneficiaries DisasterBeneficiary[]
+
+  @@index([status])
+  @@map("disasters")
+}
+
+model DisasterBeneficiary {
+  id              String     @id @default(uuid())
+  disasterId      String     @map("disaster_id")
+  residentId      String?    @map("resident_id")
+  householdId     String?    @map("household_id")
+  reliefType      String     @map("relief_type")
+  quantity        Int
+  dateDistributed DateTime   @default(now()) @map("date_distributed")
+  notes           String?
+  createdAt       DateTime   @default(now()) @map("created_at")
+  disaster        Disaster   @relation(fields: [disasterId], references: [id])
+  household       Household? @relation(fields: [householdId], references: [id])
+  resident        Resident?  @relation(fields: [residentId], references: [id])
+
+  @@index([disasterId])
+  @@map("disaster_beneficiaries")
+}
+
+model InventoryItem {
+  id        String         @id @default(uuid())
+  itemName  String         @map("item_name")
+  category  String
+  quantity  Int            @default(0)
+  unit      String
+  minStock  Int            @default(0) @map("min_stock")
+  qrCode    String?        @unique @map("qr_code")
+  location  String?
+  notes     String?
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  logs      InventoryLog[]
+
+  @@index([category])
+  @@map("inventory_items")
+}
+
+model InventoryLog {
+  id         String           @id @default(uuid())
+  itemId     String           @map("item_id")
+  type       InventoryLogType
+  quantity   Int
+  notes      String?
+  releasedTo String?          @map("released_to")
+  createdBy  String           @map("created_by")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  creator    User             @relation(fields: [createdBy], references: [id])
+  item       InventoryItem    @relation(fields: [itemId], references: [id])
+
+  @@index([itemId])
+  @@index([type])
+  @@map("inventory_logs")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  changes    String?
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+enum UserRole {
+  ADMIN
+  SECRETARY
+  CPDO
+  TREASURER
+  SK
+  STAFF
+}
+
+enum ResidencyStatus {
+  NEW
+  RETURNING
+  TRANSFERRED
+}
+
+enum DocumentType {
+  INDIGENCY
+  RESIDENCY
+  CLEARANCE
+  SOLO_PARENT
+  GOOD_MORAL
+}
+
+enum IncidentStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum ProjectStatus {
+  PLANNING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum BlotterCategory {
+  DOMESTIC_DISPUTE
+  THEFT
+  BARANGAY_DISPUTE
+  YOUTH_RELATED
+  PROPERTY_DISPUTE
+  OTHER
+}
+
+enum BlotterStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum FinancialType {
+  BUDGET
+  EXPENSE
+  ALLOCATION
+  INCOME
+}
+
+enum AnnouncementType {
+  GENERAL
+  EVENT
+  EMERGENCY
+  NOTICE
+}
+
+enum DisasterStatus {
+  ACTIVE
+  RESOLVED
+  ARCHIVED
+}
+
+enum InventoryLogType {
+  ADD
+  REMOVE
+  RELEASE
+  RETURN
+  ADJUSTMENT
+}

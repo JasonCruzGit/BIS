@@ -1,0 +1,507 @@
+import { Request, Response } from 'express';
+import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
+import { generateCertificatePDF } from '../utils/pdfGenerator';
+import path from 'path';
+import fs from 'fs';
+
+const prisma = new PrismaClient();
+
+// Generate request number
+const generateRequestNumber = () => {
+  const year = new Date().getFullYear();
+  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  return `REQ-${year}-${random}`;
+};
+
+// Resident login/verification
+export const residentLogin = async (req: Request, res: Response) => {
+  try {
+    const { contactNo, dateOfBirth } = req.body;
+
+    if (!contactNo || !dateOfBirth) {
+      return res.status(400).json({ message: 'Contact number and date of birth are required' });
+    }
+
+    const resident = await prisma.resident.findFirst({
+      where: {
+        contactNo,
+        dateOfBirth: new Date(dateOfBirth),
+        isArchived: false,
+      },
+    });
+
+    if (!resident) {
+      return res.status(401).json({ message: 'Invalid credentials or resident not found' });
+    }
+
+    // Generate token for resident session
+    const token = jwt.sign(
+      { residentId: resident.id, type: 'resident' },
+      process.env.JWT_SECRET!,
+      { expiresIn: '30d' }
+    );
+
+    res.json({
+      token,
+      resident: {
+        id: resident.id,
+        firstName: resident.firstName,
+        lastName: resident.lastName,
+        contactNo: resident.contactNo,
+        address: resident.address,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get resident's own documents
+export const getMyDocuments = async (req: Request, res: Response) => {
+  try {
+    const residentId = (req as any).residentId;
+    const { page = '1', limit = '20' } = req.query;
+
+    const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
+
+    const [documents, total] = await Promise.all([
+      prisma.document.findMany({
+        where: { residentId },
+        skip,
+        take: parseInt(limit as string),
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          documentNumber: true,
+          documentType: true,
+          issuedDate: true,
+          purpose: true,
+          filePath: true,
+        },
+      }),
+      prisma.document.count({ where: { residentId } }),
+    ]);
+
+    res.json({
+      documents,
+      pagination: {
+        page: parseInt(page as string),
+        limit: parseInt(limit as string),
+        total,
+        pages: Math.ceil(total / parseInt(limit as string)),
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get resident's document requests
+export const getMyRequests = async (req: Request, res: Response) => {
+  try {
+    const residentId = (req as any).residentId;
+    if (!residentId) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    const { page = '1', limit = '20', status } = req.query;
+
+    const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
+
+    const where: any = { residentId };
+    if (status) where.status = status;
+
+    const [requests, total] = await Promise.all([
+      prisma.documentRequest.findMany({
+        where,
+        skip,
+        take: parseInt(limit as string),
+        orderBy: { createdAt: 'desc' },
+        include: {
+          document: {
+            select: {
+              id: true,
+              documentNumber: true,
+              filePath: true,
+            },
+          },
+        },
+      }),
+      prisma.documentRequest.count({ where }),
+    ]);
+
+    res.json({
+      requests,
+      pagination: {
+        page: parseInt(page as string),
+        limit: parseInt(limit as string),
+        total,
+        pages: Math.ceil(total / parseInt(limit as string)),
+      },
+    });
+  } catch (error: any) {
+    console.error('Error in getMyRequests:', error);
+    res.status(500).json({ message: error.message || 'Internal server error' });
+  }
+};
+
+// Create document request
+export const createDocumentRequest = async (req: Request, res: Response) => {
+  try {
+    const residentId = (req as any).residentId;
+    if (!residentId) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    const { documentType, purpose } = req.body;
+
+    if (!documentType) {
+      return res.status(400).json({ message: 'Document type is required' });
+    }
+
+    // Check if resident exists
+    const resident = await prisma.resident.findUnique({
+      where: { id: residentId },
+    });
+
+    if (!resident || resident.isArchived) {
+      return res.status(404).json({ message: 'Resident not found' });
+    }
+
+    // Create request
+    const request = await prisma.documentRequest.create({
+      data: {
+        requestNumber: generateRequestNumber(),
+        residentId,
+        documentType,
+        purpose: purpose || null,
+        status: 'PENDING',
+        paymentStatus: 'UNPAID',
+      },
+    });
+
+    res.status(201).json({
+      message: 'Document request submitted successfully',
+      request,
+    });
+  } catch (error: any) {
+    console.error('Error in createDocumentRequest:', error);
+    res.status(500).json({ message: error.message || 'Internal server error' });
+  }
+};
+
+// Get request details
+export const getRequestDetails = async (req: Request, res: Response) => {
+  try {
+    const residentId = (req as any).residentId;
+    if (!residentId) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    const { id } = req.params;
+
+    const request = await prisma.documentRequest.findFirst({
+      where: {
+        id,
+        residentId,
+      },
+      include: {
+        resident: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            address: true,
+          },
+        },
+        document: {
+          select: {
+            id: true,
+            documentNumber: true,
+            filePath: true,
+            issuedDate: true,
+            issuedBy: true,
+          },
+        },
+        processor: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
+
+    if (!request) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+
+    // If document exists but doesn't have a filePath, generate it
+    if (request.document && !request.document.filePath && (request.status === 'APPROVED' || request.status === 'COMPLETED')) {
+      try {
+        // Get issuer information - use processedBy or document's issuedBy
+        const issuerId = request.processedBy || request.document.issuedBy;
+        if (!issuerId) {
+          console.error('No issuer found for document:', request.document.id);
+        } else {
+          const issuer = await prisma.user.findUnique({
+            where: { id: issuerId },
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          });
+
+          if (issuer && request.resident) {
+            const outputDir = path.join(__dirname, '../../uploads/documents');
+            if (!fs.existsSync(outputDir)) {
+              fs.mkdirSync(outputDir, { recursive: true });
+            }
+
+          const outputPath = path.join(outputDir, `${request.document.documentNumber}.pdf`);
+
+          console.log('Generating PDF for document:', request.document.documentNumber);
+          console.log('Output path:', outputPath);
+          console.log('Resident:', `${request.resident.firstName} ${request.resident.lastName}`);
+          console.log('Issuer:', `${issuer.firstName} ${issuer.lastName}`);
+            
+          await generateCertificatePDF({
+            documentNumber: request.document.documentNumber,
+            documentType: request.documentType,
+            residentName: `${request.resident.firstName} ${request.resident.lastName}`,
+            residentAddress: request.resident.address,
+            purpose: request.purpose || undefined,
+            issuedDate: request.document.issuedDate,
+            issuedBy: `${issuer.firstName} ${issuer.lastName}`,
+            template: undefined,
+          }, outputPath);
+
+          // Verify file was created
+          if (fs.existsSync(outputPath)) {
+            // Update document with file path
+            await prisma.document.update({
+              where: { id: request.document.id },
+              data: { filePath: `/uploads/documents/${request.document.documentNumber}.pdf` },
+            });
+
+            console.log('✅ PDF generated and saved:', `/uploads/documents/${request.document.documentNumber}.pdf`);
+          } else {
+            console.error('❌ PDF file was not created at:', outputPath);
+            throw new Error('PDF file was not created');
+          }
+
+            // Refetch request with updated document
+            const updatedRequest = await prisma.documentRequest.findFirst({
+              where: {
+                id,
+                residentId,
+              },
+              include: {
+                resident: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    address: true,
+                  },
+                },
+                document: {
+                  select: {
+                    id: true,
+                    documentNumber: true,
+                    filePath: true,
+                    issuedDate: true,
+                  },
+                },
+                processor: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                  },
+                },
+              },
+            });
+
+            if (updatedRequest) {
+              return res.json(updatedRequest);
+            }
+          } else {
+            console.error('Missing issuer or resident data:', { issuer: !!issuer, resident: !!request.resident });
+          }
+        }
+      } catch (pdfError: any) {
+        console.error('Error generating PDF in getRequestDetails:', pdfError);
+        console.error('Error stack:', pdfError.stack);
+        // Continue and return request even if PDF generation fails
+      }
+    }
+
+    res.json(request);
+  } catch (error: any) {
+    console.error('Error in getRequestDetails:', error);
+    res.status(500).json({ message: error.message || 'Internal server error' });
+  }
+};
+
+// Submit complaint/request
+export const submitComplaint = async (req: Request, res: Response) => {
+  try {
+    const residentId = (req as any).residentId;
+    const { subject, description, category, attachments } = req.body;
+
+    if (!subject || !description) {
+      return res.status(400).json({ message: 'Subject and description are required' });
+    }
+
+    // Get system user (first admin)
+    const systemUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    if (!systemUser) {
+      return res.status(500).json({ message: 'System configuration error' });
+    }
+
+    // Create incident as complaint
+    const incident = await prisma.incident.create({
+      data: {
+        incidentNumber: `COMP-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
+        complainantId: residentId,
+        narrative: `[COMPLAINT/REQUEST]\nSubject: ${subject}\nCategory: ${category || 'General'}\n\n${description}`,
+        incidentDate: new Date(),
+        status: 'PENDING',
+        attachments: attachments || [],
+        createdBy: systemUser.id,
+      },
+    });
+
+    res.status(201).json({
+      message: 'Complaint/request submitted successfully',
+      incident: {
+        id: incident.id,
+        incidentNumber: incident.incidentNumber,
+        status: incident.status,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get public announcements
+export const getPublicAnnouncements = async (req: Request, res: Response) => {
+  try {
+    const { page = '1', limit = '10' } = req.query;
+    const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
+
+    const now = new Date();
+
+    const [announcements, total] = await Promise.all([
+      prisma.announcement.findMany({
+        where: {
+          OR: [
+            { startDate: null },
+            { startDate: { lte: now } },
+          ],
+          AND: [
+            {
+              OR: [
+                { endDate: null },
+                { endDate: { gte: now } },
+              ],
+            },
+          ],
+        },
+        skip,
+        take: parseInt(limit as string),
+        orderBy: [
+          { isPinned: 'desc' },
+          { createdAt: 'desc' },
+        ],
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          type: true,
+          isPinned: true,
+          attachments: true,
+          startDate: true,
+          endDate: true,
+          createdAt: true,
+        },
+      }),
+      prisma.announcement.count({
+        where: {
+          OR: [
+            { startDate: null },
+            { startDate: { lte: now } },
+          ],
+          AND: [
+            {
+              OR: [
+                { endDate: null },
+                { endDate: { gte: now } },
+              ],
+            },
+          ],
+        },
+      }),
+    ]);
+
+    res.json({
+      announcements,
+      pagination: {
+        page: parseInt(page as string),
+        limit: parseInt(limit as string),
+        total,
+        pages: Math.ceil(total / parseInt(limit as string)),
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get document types
+export const getDocumentTypes = async (req: Request, res: Response) => {
+  res.json({
+    types: [
+      { value: 'INDIGENCY', label: 'Certificate of Indigency' },
+      { value: 'RESIDENCY', label: 'Certificate of Residency' },
+      { value: 'CLEARANCE', label: 'Barangay Clearance' },
+      { value: 'SOLO_PARENT', label: 'Solo Parent Certificate' },
+      { value: 'GOOD_MORAL', label: 'Certificate of Good Moral Character' },
+    ],
+  });
+};
+
+// Payment callback (for payment gateway integration)
+export const paymentCallback = async (req: Request, res: Response) => {
+  try {
+    const { requestId, paymentReference, paymentMethod, status } = req.body;
+
+    if (!requestId || !status) {
+      return res.status(400).json({ message: 'Request ID and payment status are required' });
+    }
+
+    const request = await prisma.documentRequest.findUnique({
+      where: { id: requestId },
+    });
+
+    if (!request) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+
+    await prisma.documentRequest.update({
+      where: { id: requestId },
+      data: {
+        paymentStatus: status === 'success' ? 'PAID' : status === 'pending' ? 'PENDING' : 'FAILED',
+        paymentMethod,
+        paymentReference,
+      },
+    });
+
+    res.json({ message: 'Payment status updated' });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
