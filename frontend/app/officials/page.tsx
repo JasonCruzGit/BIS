@@ -123,16 +123,21 @@ export default function OfficialsPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Barangay Officials</h1>
-            <p className="mt-2 text-gray-600">Manage officials and employee directory</p>
-          </div>
-          <div className="flex gap-3">
+        {/* Banner Header */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 rounded-2xl shadow-lg p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-300 flex items-center justify-center">
+                <UserCheck className="h-8 w-8 text-gray-600" />
+              </div>
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-bold text-white mb-1">Barangay Officials</h1>
+                <p className="text-white/90 text-sm sm:text-base">Manage officials and employee directory</p>
+              </div>
+            </div>
             <Link
               href="/officials/new"
-              className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
+              className="inline-flex items-center px-5 py-2.5 bg-white text-primary-600 rounded-lg hover:bg-gray-50 transition-colors shadow-md font-semibold whitespace-nowrap"
             >
               <Plus className="h-5 w-5 mr-2" />
               Add Official

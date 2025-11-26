@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query'
 import api from '@/lib/api'
 import toast from 'react-hot-toast'
 import Layout from '@/components/Layout'
-import { FileText, MessageSquare, CheckCircle, XCircle, Clock, Search, Filter } from 'lucide-react'
+import { FileText, MessageSquare, CheckCircle, XCircle, Clock, Search, Filter, Plus } from 'lucide-react'
 
 type DocumentRequest = {
   id: string
@@ -161,10 +161,18 @@ export default function ResidentRequestsPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Resident Requests</h1>
-            <p className="text-gray-600 mt-1">Manage document requests and complaints from residents</p>
+        {/* Banner Header */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 rounded-2xl shadow-lg p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-300 flex items-center justify-center">
+                <MessageSquare className="h-8 w-8 text-gray-600" />
+              </div>
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-bold text-white mb-1">Resident Requests</h1>
+                <p className="text-white/90 text-sm sm:text-base">Manage document requests and complaints from residents</p>
+              </div>
+            </div>
           </div>
         </div>
 

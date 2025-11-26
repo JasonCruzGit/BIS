@@ -171,27 +171,34 @@ export default function BlotterPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Blotter System</h1>
-            <p className="mt-2 text-gray-600">Manage barangay blotter entries and case reports</p>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={handleExport}
-              className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
-            >
-              <Download className="h-5 w-5 mr-2" />
-              Export Report
-            </button>
-            <Link
-              href="/blotter/new"
-              className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
-            >
-              <Plus className="h-5 w-5 mr-2" />
-              New Entry
-            </Link>
+        {/* Banner Header */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 rounded-2xl shadow-lg p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-300 flex items-center justify-center">
+                <BookOpen className="h-8 w-8 text-gray-600" />
+              </div>
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-bold text-white mb-1">Blotter System</h1>
+                <p className="text-white/90 text-sm sm:text-base">Manage barangay blotter entries and case reports</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleExport}
+                className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm text-white border border-white/30 rounded-lg hover:bg-white/30 transition-colors shadow-sm font-semibold"
+              >
+                <Download className="h-5 w-5 mr-2" />
+                Export Report
+              </button>
+              <Link
+                href="/blotter/new"
+                className="inline-flex items-center px-5 py-2.5 bg-white text-primary-600 rounded-lg hover:bg-gray-50 transition-colors shadow-md font-semibold whitespace-nowrap"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                New Entry
+              </Link>
+            </div>
           </div>
         </div>
 
