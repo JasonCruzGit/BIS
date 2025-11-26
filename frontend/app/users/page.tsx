@@ -137,10 +137,9 @@ export default function UsersPage() {
     setLoading(true)
     try {
       const updateData = { ...formData }
-      if (!updateData.password) {
-        delete updateData.password
-      }
-      await updateMutation.mutateAsync({ id: selectedUser.id, userData: updateData })
+      const { password, ...rest } = updateData
+      const payload = password ? updateData : rest
+      await updateMutation.mutateAsync({ id: selectedUser.id, userData: payload })
     } finally {
       setLoading(false)
     }
