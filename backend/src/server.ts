@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 // Routes
 import authRoutes from './routes/auth.routes';
@@ -126,9 +127,52 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
+// Reset admin password on startup
+async function ensureAdminPassword() {
+  try {
+    const email = process.env.ADMIN_EMAIL || 'admin@barangay.gov.ph';
+    const newPassword = process.env.ADMIN_PASSWORD || 'p@ssword123';
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      console.log(`Creating admin user with email: ${email}`);
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          firstName: 'Admin',
+          lastName: 'User',
+          role: 'ADMIN',
+          isActive: true,
+        },
+      });
+      console.log(`✅ Admin user created: ${email}`);
+    } else {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          isActive: true,
+        },
+      });
+      console.log(`✅ Admin password reset: ${email}`);
+    }
+  } catch (error: any) {
+    console.error('❌ Error ensuring admin password:', error.message);
+    // Don't exit - allow server to start even if admin reset fails
+  }
+}
+
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Server running on port ${PORT}`);
+  // Reset admin password after server starts
+  await ensureAdminPassword();
 });
 
 // Graceful shutdown

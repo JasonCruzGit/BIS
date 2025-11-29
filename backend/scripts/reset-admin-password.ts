@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 async function resetAdminPassword() {
   try {
     const email = process.env.ADMIN_EMAIL || 'admin@barangay.gov.ph';
-    const newPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const newPassword = process.env.ADMIN_PASSWORD || 'p@ssword123';
 
     // Find the user
     const user = await prisma.user.findUnique({
