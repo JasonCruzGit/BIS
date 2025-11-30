@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query'
 import api from '@/lib/api'
 import Layout from '@/components/Layout'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Save, FileText, Search } from 'lucide-react'
+import { ArrowLeft, Save, FileText, Search, FileCheck, User, Edit3, X } from 'lucide-react'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/store'
 
@@ -172,31 +172,42 @@ export default function NewDocumentPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Enhanced Header Banner */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 rounded-xl shadow-lg p-6 border border-primary-500/20">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full blur-3xl"></div>
+          
+          <div className="relative flex items-center gap-4">
             <Link
               href="/documents"
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 bg-white/10 backdrop-blur-sm hover:bg-white/20 rounded-lg transition-colors border border-white/20"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-5 w-5 text-white" />
             </Link>
+            <div className="p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+              <FileText className="h-8 w-8 text-white" />
+            </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Issue Document</h1>
-              <p className="mt-1 text-gray-600">Generate a new barangay document</p>
+              <h1 className="text-3xl font-bold text-white mb-1">Issue Document</h1>
+              <p className="text-white/90 text-sm">Generate a new barangay document</p>
             </div>
           </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 space-y-8">
           {/* Document Type Section */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Document Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <FileCheck className="h-5 w-5 text-primary-600" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-900">Document Information</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Document Type <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -204,7 +215,7 @@ export default function NewDocumentPage() {
                   value={formData.documentType}
                   onChange={handleTypeChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
                 >
                   <option value="">Select document type...</option>
                   {documentTypes?.map((type: any) => (
@@ -215,7 +226,7 @@ export default function NewDocumentPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Purpose
                 </label>
                 <input
@@ -224,24 +235,34 @@ export default function NewDocumentPage() {
                   value={formData.purpose}
                   onChange={handleInputChange}
                   placeholder="e.g., For scholarship application"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
                 />
               </div>
             </div>
           </div>
 
           {/* Resident Selection Section */}
-          <div className="border-t border-gray-200 pt-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Resident Information</h2>
+          <div className="border-t border-gray-200 pt-8">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <User className="h-5 w-5 text-primary-600" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-900">Resident Information</h2>
+            </div>
             <div className="space-y-4">
               {selectedResident ? (
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="p-5 bg-gradient-to-r from-primary-50 to-blue-50 rounded-lg border-2 border-primary-200">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {selectedResident.firstName} {selectedResident.lastName}
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">{selectedResident.address}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary-100 rounded-lg">
+                        <User className="h-5 w-5 text-primary-600" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-900">
+                          {selectedResident.firstName} {selectedResident.lastName}
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1">{selectedResident.address}</p>
+                      </div>
                     </div>
                     <button
                       type="button"
@@ -249,19 +270,21 @@ export default function NewDocumentPage() {
                         setSelectedResident(null)
                         setFormData(prev => ({ ...prev, residentId: '' }))
                       }}
-                      className="text-sm text-red-600 hover:text-red-700"
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                     >
+                      <X className="h-4 w-4" />
                       Change
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className="relative">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Search className="h-4 w-4 inline mr-1.5" />
                     Search Resident <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input
                       type="text"
                       placeholder="Search by name or address..."
@@ -271,22 +294,22 @@ export default function NewDocumentPage() {
                         setShowResidentSearch(true)
                       }}
                       onFocus={() => setShowResidentSearch(true)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
                     />
                   </div>
                   {showResidentSearch && searchResults && searchResults.length > 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <div className="absolute z-10 w-full mt-2 bg-white border-2 border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                       {searchResults.map((resident: any) => (
                         <button
                           key={resident.id}
                           type="button"
                           onClick={() => handleSelectResident(resident)}
-                          className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                          className="w-full px-4 py-3 text-left hover:bg-primary-50 border-b border-gray-100 last:border-b-0 transition-colors"
                         >
-                          <p className="font-medium text-gray-900">
+                          <p className="font-semibold text-gray-900">
                             {resident.firstName} {resident.lastName}
                           </p>
-                          <p className="text-sm text-gray-500">{resident.address}</p>
+                          <p className="text-sm text-gray-600 mt-0.5">{resident.address}</p>
                         </button>
                       ))}
                     </div>
@@ -298,10 +321,15 @@ export default function NewDocumentPage() {
 
           {/* Template Section */}
           {formData.documentType && (
-            <div className="border-t border-gray-200 pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Document Template</h2>
+            <div className="border-t border-gray-200 pt-8">
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+                <div className="p-2 bg-primary-100 rounded-lg">
+                  <Edit3 className="h-5 w-5 text-primary-600" />
+                </div>
+                <h2 className="text-lg font-bold text-gray-900">Document Template</h2>
+              </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Custom Template (Optional)
                 </label>
                 <textarea
@@ -310,27 +338,32 @@ export default function NewDocumentPage() {
                   onChange={handleInputChange}
                   rows={8}
                   placeholder="Enter custom template text. Use [RESIDENT_NAME], [RESIDENT_ADDRESS], and [PURPOSE] as placeholders."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white font-mono text-sm resize-none"
                 />
-                <p className="text-xs text-gray-500 mt-2">
-                  Leave empty to use default template. Available placeholders: [RESIDENT_NAME], [RESIDENT_ADDRESS], [PURPOSE]
-                </p>
+                <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="text-xs text-gray-600">
+                    <span className="font-semibold">Note:</span> Leave empty to use default template. Available placeholders: 
+                    <span className="font-mono bg-white px-1.5 py-0.5 rounded mx-1">[RESIDENT_NAME]</span>, 
+                    <span className="font-mono bg-white px-1.5 py-0.5 rounded mx-1">[RESIDENT_ADDRESS]</span>, 
+                    <span className="font-mono bg-white px-1.5 py-0.5 rounded mx-1">[PURPOSE]</span>
+                  </p>
+                </div>
               </div>
             </div>
           )}
 
           {/* Form Actions */}
-          <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-end gap-3 pt-6 border-t-2 border-gray-200">
             <Link
               href="/documents"
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-semibold"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={loading || !formData.residentId}
-              className="flex items-center px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg font-semibold"
             >
               {loading ? (
                 <>

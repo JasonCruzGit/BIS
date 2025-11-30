@@ -492,3 +492,4 @@ Stop wasting time on manual paperwork. The Barangay Information System automates
 *All marketing copy is ready to use. Customize with your specific contact information and branding.*
 
 
+

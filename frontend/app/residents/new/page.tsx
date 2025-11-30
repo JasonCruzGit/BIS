@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query'
 import api from '@/lib/api'
 import Layout from '@/components/Layout'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Save, Upload, X, User } from 'lucide-react'
+import { ArrowLeft, Save, Upload, X, User, UserCircle, Phone, MapPin, Briefcase, GraduationCap, Home, Camera } from 'lucide-react'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/store'
 
@@ -124,31 +124,42 @@ export default function NewResidentPage() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Enhanced Header Banner */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 rounded-xl shadow-lg p-6 border border-primary-500/20">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full blur-3xl"></div>
+          
+          <div className="relative flex items-center gap-4">
             <Link
               href="/residents"
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 bg-white/10 backdrop-blur-sm hover:bg-white/20 rounded-lg transition-colors border border-white/20"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-5 w-5 text-white" />
             </Link>
+            <div className="p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+              <UserCircle className="h-8 w-8 text-white" />
+            </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Add New Resident</h1>
-              <p className="mt-1 text-gray-600">Enter resident information</p>
+              <h1 className="text-3xl font-bold text-white mb-1">Add New Resident</h1>
+              <p className="text-white/90 text-sm">Enter resident information to register in the system</p>
             </div>
           </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 space-y-8">
           {/* Personal Information Section */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <User className="h-5 w-5 text-primary-600" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-900">Personal Information</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   First Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -157,11 +168,12 @@ export default function NewResidentPage() {
                   value={formData.firstName}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
+                  placeholder="Enter first name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Middle Name
                 </label>
                 <input
@@ -169,11 +181,12 @@ export default function NewResidentPage() {
                   name="middleName"
                   value={formData.middleName}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
+                  placeholder="Enter middle name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Last Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -182,11 +195,12 @@ export default function NewResidentPage() {
                   value={formData.lastName}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
+                  placeholder="Enter last name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Suffix (Jr., Sr., etc.)
                 </label>
                 <input
@@ -195,11 +209,11 @@ export default function NewResidentPage() {
                   value={formData.suffix}
                   onChange={handleInputChange}
                   placeholder="Jr., Sr., III"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Date of Birth <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -209,11 +223,11 @@ export default function NewResidentPage() {
                   onChange={handleInputChange}
                   required
                   max={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Sex <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -221,7 +235,7 @@ export default function NewResidentPage() {
                   value={formData.sex}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
                 >
                   <option value="">Select...</option>
                   <option value="MALE">Male</option>
@@ -229,7 +243,7 @@ export default function NewResidentPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Civil Status <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -237,7 +251,7 @@ export default function NewResidentPage() {
                   value={formData.civilStatus}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
                 >
                   <option value="">Select...</option>
                   <option value="SINGLE">Single</option>
@@ -248,7 +262,7 @@ export default function NewResidentPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Residency Status <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -256,7 +270,7 @@ export default function NewResidentPage() {
                   value={formData.residencyStatus}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
                 >
                   <option value="NEW">New</option>
                   <option value="RETURNING">Returning</option>
@@ -267,11 +281,17 @@ export default function NewResidentPage() {
           </div>
 
           {/* Contact Information Section */}
-          <div className="border-t border-gray-200 pt-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border-t border-gray-200 pt-8">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <Phone className="h-5 w-5 text-primary-600" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-900">Contact Information</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <MapPin className="h-4 w-4 inline mr-1.5" />
                   Address <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -280,11 +300,13 @@ export default function NewResidentPage() {
                   onChange={handleInputChange}
                   required
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white resize-none"
+                  placeholder="Enter complete address"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <Phone className="h-4 w-4 inline mr-1.5" />
                   Contact Number <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -294,18 +316,24 @@ export default function NewResidentPage() {
                   onChange={handleInputChange}
                   required
                   placeholder="09XX XXX XXXX"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
                 />
               </div>
             </div>
           </div>
 
           {/* Additional Information Section */}
-          <div className="border-t border-gray-200 pt-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border-t border-gray-200 pt-8">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <Briefcase className="h-5 w-5 text-primary-600" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-900">Additional Information</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <Briefcase className="h-4 w-4 inline mr-1.5" />
                   Occupation
                 </label>
                 <input
@@ -313,18 +341,20 @@ export default function NewResidentPage() {
                   name="occupation"
                   value={formData.occupation}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
+                  placeholder="Enter occupation"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <GraduationCap className="h-4 w-4 inline mr-1.5" />
                   Education
                 </label>
                 <select
                   name="education"
                   value={formData.education}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
                 >
                   <option value="">Select...</option>
                   <option value="ELEMENTARY">Elementary</option>
@@ -336,14 +366,15 @@ export default function NewResidentPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <Home className="h-4 w-4 inline mr-1.5" />
                   Household (Optional)
                 </label>
                 <select
                   name="householdId"
                   value={formData.householdId}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white"
                 >
                   <option value="">Select household...</option>
                   {householdsData?.map((household: any) => (
@@ -357,37 +388,45 @@ export default function NewResidentPage() {
           </div>
 
           {/* ID Photo Section */}
-          <div className="border-t border-gray-200 pt-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">ID Photo</h2>
-            <div className="flex items-start gap-6">
+          <div className="border-t border-gray-200 pt-8">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <Camera className="h-5 w-5 text-primary-600" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-900">ID Photo</h2>
+            </div>
+            <div className="flex flex-col sm:flex-row items-start gap-6">
               <div className="flex-shrink-0">
                 {idPhotoPreview ? (
-                  <div className="relative">
+                  <div className="relative group">
                     <img
                       src={idPhotoPreview}
                       alt="Preview"
-                      className="h-32 w-32 rounded-lg object-cover border-2 border-gray-200"
+                      className="h-40 w-40 rounded-xl object-cover border-2 border-gray-200 shadow-md"
                     />
                     <button
                       type="button"
                       onClick={removePhoto}
-                      className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg transition-colors"
                     >
                       <X className="h-4 w-4" />
                     </button>
                   </div>
                 ) : (
-                  <div className="h-32 w-32 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50">
-                    <User className="h-12 w-12 text-gray-400" />
+                  <div className="h-40 w-40 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 hover:border-primary-400 transition-colors">
+                    <div className="text-center">
+                      <Camera className="h-10 w-10 text-gray-400 mx-auto mb-2" />
+                      <p className="text-xs text-gray-500">No photo</p>
+                    </div>
                   </div>
                 )}
               </div>
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="flex-1 w-full">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
                   Upload ID Photo
                 </label>
-                <div className="flex items-center gap-4">
-                  <label className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 cursor-pointer transition-colors">
+                <div className="space-y-3">
+                  <label className="inline-flex items-center px-5 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 cursor-pointer transition-colors shadow-md hover:shadow-lg font-medium">
                     <Upload className="h-4 w-4 mr-2" />
                     Choose File
                     <input
@@ -397,29 +436,33 @@ export default function NewResidentPage() {
                       className="hidden"
                     />
                   </label>
-                  <span className="text-sm text-gray-500">
-                    {idPhotoFile ? idPhotoFile.name : 'No file selected'}
-                  </span>
+                  {idPhotoFile && (
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-sm font-medium text-gray-700">
+                        Selected: <span className="text-primary-600">{idPhotoFile.name}</span>
+                      </p>
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500">
+                    Maximum file size: 5MB. Supported formats: JPG, PNG
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  Maximum file size: 5MB. Supported formats: JPG, PNG
-                </p>
               </div>
             </div>
           </div>
 
           {/* Form Actions */}
-          <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-end gap-3 pt-6 border-t-2 border-gray-200">
             <Link
               href="/residents"
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-semibold"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg font-semibold"
             >
               {loading ? (
                 <>
