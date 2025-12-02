@@ -189,9 +189,25 @@ export default function PublicResidentPage() {
 
             {/* Name and Info Section */}
             <div className="flex-1 text-center sm:text-left">
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 leading-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
                 {resident.firstName} {resident.middleName} {resident.lastName} {resident.suffix}
               </h1>
+              
+              {/* Address and Contact - Corporate Style */}
+              <div className="space-y-3 mb-4">
+                <div className="flex items-start justify-center sm:justify-start gap-3 text-gray-700">
+                  <MapPin className="h-5 w-5 text-primary-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-base sm:text-lg font-medium leading-relaxed">{resident.address}</span>
+                </div>
+                <div className="flex items-center justify-center sm:justify-start gap-3 text-gray-700">
+                  <Phone className="h-5 w-5 text-primary-600 flex-shrink-0" />
+                  <a href={`tel:${resident.contactNo}`} className="text-base sm:text-lg font-medium text-primary-600 hover:text-primary-700 transition-colors">
+                    {resident.contactNo}
+                  </a>
+                </div>
+              </div>
+
+              {/* Status Badges */}
               <div className="flex flex-wrap gap-2.5 justify-center sm:justify-start mt-4">
                 <span className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-primary-100 to-primary-50 text-primary-800 rounded-full flex items-center gap-2 shadow-sm border border-primary-200">
                   <CheckCircle className="h-4 w-4" />
@@ -205,104 +221,61 @@ export default function PublicResidentPage() {
           </div>
         </div>
 
-        {/* Information Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-          {/* Personal Information */}
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-6 sm:p-7 border border-white/50 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-              <div className="p-3 bg-gradient-to-br from-primary-100 to-primary-50 rounded-xl shadow-sm">
-                <User className="h-6 w-6 text-primary-600" />
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Personal Information</h2>
+        {/* Personal Information Card */}
+        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-6 sm:p-8 border border-white/50">
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-gray-200">
+            <div className="p-3 bg-gradient-to-br from-primary-100 to-primary-50 rounded-xl shadow-sm">
+              <User className="h-6 w-6 text-primary-600" />
             </div>
-            <div className="space-y-5">
-              <div className="p-3 bg-gray-50/50 rounded-lg border border-gray-100">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Date of Birth</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Personal Information</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Date of Birth</p>
+              <div className="flex items-center text-gray-900">
+                <Calendar className="h-4 w-4 mr-2 text-primary-600" />
+                <span className="font-semibold text-base">
+                  {format(new Date(resident.dateOfBirth), 'MMMM d, yyyy')}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Sex</p>
+              <p className="font-semibold text-base text-gray-900">{resident.sex}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Civil Status</p>
+              <p className="font-semibold text-base text-gray-900">{resident.civilStatus}</p>
+            </div>
+            {resident.occupation && (
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Occupation</p>
                 <div className="flex items-center text-gray-900">
-                  <div className="p-1.5 bg-blue-100 rounded-lg mr-3">
-                    <Calendar className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <span className="font-semibold text-lg">
-                    {format(new Date(resident.dateOfBirth), 'MMMM d, yyyy')}
+                  <Briefcase className="h-4 w-4 mr-2 text-primary-600" />
+                  <span className="font-semibold text-base">{resident.occupation}</span>
+                </div>
+              </div>
+            )}
+            {resident.education && (
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Education</p>
+                <div className="flex items-center text-gray-900">
+                  <GraduationCap className="h-4 w-4 mr-2 text-primary-600" />
+                  <span className="font-semibold text-base">{resident.education}</span>
+                </div>
+              </div>
+            )}
+            {resident.household && (
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Household</p>
+                <div className="flex items-center text-gray-900">
+                  <Home className="h-4 w-4 mr-2 text-primary-600" />
+                  <span className="font-semibold text-base">
+                    {resident.household.householdNumber} - {resident.household.headName}
                   </span>
                 </div>
               </div>
-              <div className="p-3 bg-gray-50/50 rounded-lg border border-gray-100">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Sex</p>
-                <p className="font-semibold text-lg text-gray-900">{resident.sex}</p>
-              </div>
-              <div className="p-3 bg-gray-50/50 rounded-lg border border-gray-100">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Civil Status</p>
-                <p className="font-semibold text-lg text-gray-900">{resident.civilStatus}</p>
-              </div>
-              {resident.occupation && (
-                <div className="p-3 bg-gray-50/50 rounded-lg border border-gray-100">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Occupation</p>
-                  <div className="flex items-center text-gray-900">
-                    <div className="p-1.5 bg-purple-100 rounded-lg mr-3">
-                      <Briefcase className="h-4 w-4 text-purple-600" />
-                    </div>
-                    <span className="font-semibold text-lg">{resident.occupation}</span>
-                  </div>
-                </div>
-              )}
-              {resident.education && (
-                <div className="p-3 bg-gray-50/50 rounded-lg border border-gray-100">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Education</p>
-                  <div className="flex items-center text-gray-900">
-                    <div className="p-1.5 bg-indigo-100 rounded-lg mr-3">
-                      <GraduationCap className="h-4 w-4 text-indigo-600" />
-                    </div>
-                    <span className="font-semibold text-lg">{resident.education}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-6 sm:p-7 border border-white/50 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-              <div className="p-3 bg-gradient-to-br from-green-100 to-emerald-50 rounded-xl shadow-sm">
-                <Phone className="h-6 w-6 text-green-600" />
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Contact Information</h2>
-            </div>
-            <div className="space-y-5">
-              <div className="p-3 bg-gray-50/50 rounded-lg border border-gray-100">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Contact Number</p>
-                <div className="flex items-center text-gray-900">
-                  <div className="p-1.5 bg-green-100 rounded-lg mr-3">
-                    <Phone className="h-4 w-4 text-green-600" />
-                  </div>
-                  <a href={`tel:${resident.contactNo}`} className="font-semibold text-lg text-primary-600 hover:text-primary-700 transition-colors">
-                    {resident.contactNo}
-                  </a>
-                </div>
-              </div>
-              <div className="p-3 bg-gray-50/50 rounded-lg border border-gray-100">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Address</p>
-                <div className="flex items-start text-gray-900">
-                  <div className="p-1.5 bg-red-100 rounded-lg mr-3 mt-0.5 flex-shrink-0">
-                    <MapPin className="h-4 w-4 text-red-600" />
-                  </div>
-                  <span className="font-semibold text-lg leading-relaxed">{resident.address}</span>
-                </div>
-              </div>
-              {resident.household && (
-                <div className="p-3 bg-gray-50/50 rounded-lg border border-gray-100">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Household</p>
-                  <div className="flex items-center text-gray-900">
-                    <div className="p-1.5 bg-orange-100 rounded-lg mr-3">
-                      <Home className="h-4 w-4 text-orange-600" />
-                    </div>
-                    <span className="font-semibold text-lg">
-                      {resident.household.householdNumber} - {resident.household.headName}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
