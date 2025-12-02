@@ -1,8 +1,20 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest, createAuditLog } from '../middleware/auth.middleware';
+import { generateQRCodeDataURL } from '../utils/qrGenerator';
 
 const prisma = new PrismaClient();
+
+// Helper function to generate QR code data for resident
+const generateResidentQRCode = (qrCode: string): string => {
+  // Always use production URL for QR codes so they work when scanned
+  // QR codes should point to the deployed site, not localhost
+  const productionUrl = 'https://frontend-blush-chi-30.vercel.app';
+  
+  // Remove trailing slash if present
+  const cleanUrl = productionUrl.replace(/\/$/, '');
+  return `${cleanUrl}/public/resident/${qrCode}`;
+};
 
 export const getResidents = async (req: AuthRequest, res: Response) => {
   try {
@@ -85,27 +97,63 @@ export const createResident = async (req: AuthRequest, res: Response) => {
 
     const idPhoto = req.file ? `/uploads/residents/${req.file.filename}` : null;
 
-    const resident = await prisma.resident.create({
-      data: {
-        firstName,
-        middleName: middleName || null,
-        lastName,
-        suffix: suffix || null,
-        dateOfBirth: new Date(dateOfBirth),
-        sex,
-        civilStatus,
-        address,
-        contactNo,
-        occupation: occupation || null,
-        education: education || null,
-        householdId: householdId || null,
-        residencyStatus: residencyStatus || 'NEW',
-        idPhoto
-      },
-      include: {
-        household: true
+    // Generate unique QR code identifier
+    const qrCodeId = `RES-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Try to create with qrCode, fallback if column doesn't exist
+    let resident;
+    try {
+      resident = await prisma.resident.create({
+        data: {
+          firstName,
+          middleName: middleName || null,
+          lastName,
+          suffix: suffix || null,
+          dateOfBirth: new Date(dateOfBirth),
+          sex,
+          civilStatus,
+          address,
+          contactNo,
+          occupation: occupation || null,
+          education: education || null,
+          householdId: householdId || null,
+          residencyStatus: residencyStatus || 'NEW',
+          idPhoto,
+          qrCode: qrCodeId
+        },
+        include: {
+          household: true
+        }
+      });
+    } catch (error: any) {
+      // If qrCode column doesn't exist, create without it
+      if (error.message?.includes('qr_code') || error.message?.includes('Unknown column')) {
+        console.warn('QR code column not found, creating resident without QR code. Please run migration.');
+        resident = await prisma.resident.create({
+          data: {
+            firstName,
+            middleName: middleName || null,
+            lastName,
+            suffix: suffix || null,
+            dateOfBirth: new Date(dateOfBirth),
+            sex,
+            civilStatus,
+            address,
+            contactNo,
+            occupation: occupation || null,
+            education: education || null,
+            householdId: householdId || null,
+            residencyStatus: residencyStatus || 'NEW',
+            idPhoto
+          },
+          include: {
+            household: true
+          }
+        });
+      } else {
+        throw error;
       }
-    });
+    }
 
     await createAuditLog(
       req.user!.id,
@@ -227,6 +275,98 @@ export const searchResidents = async (req: AuthRequest, res: Response) => {
     });
 
     res.json(residents);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get QR code for a resident
+export const getResidentQRCode = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const resident = await prisma.resident.findUnique({ 
+      where: { id },
+      select: { id: true, qrCode: true, firstName: true, lastName: true }
+    });
+
+    if (!resident) {
+      return res.status(404).json({ message: 'Resident not found' });
+    }
+
+    // Generate QR code if it doesn't exist
+    let qrCodeId = resident.qrCode;
+    if (!qrCodeId) {
+      qrCodeId = `RES-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      await prisma.resident.update({
+        where: { id },
+        data: { qrCode: qrCodeId }
+      });
+    }
+
+    // Generate QR code data URL
+    const qrCodeUrl = generateResidentQRCode(qrCodeId);
+    const qrCodeDataURL = await generateQRCodeDataURL(qrCodeUrl);
+
+    res.json({ 
+      qrCode: qrCodeDataURL, 
+      qrCodeId,
+      qrCodeUrl,
+      residentName: `${resident.firstName} ${resident.lastName}` 
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Public endpoint to get resident info by QR code (no auth required)
+export const getResidentByQRCode = async (req: Request, res: Response) => {
+  try {
+    const { qrCode } = req.params;
+
+    const resident = await prisma.resident.findUnique({
+      where: { qrCode },
+      include: {
+        household: true,
+        documents: {
+          orderBy: { issuedDate: 'desc' },
+          take: 5
+        }
+      }
+    });
+
+    if (!resident) {
+      return res.status(404).json({ message: 'Resident not found' });
+    }
+
+    // Return public-safe information (exclude sensitive data)
+    res.json({
+      id: resident.id,
+      firstName: resident.firstName,
+      middleName: resident.middleName,
+      lastName: resident.lastName,
+      suffix: resident.suffix,
+      dateOfBirth: resident.dateOfBirth,
+      sex: resident.sex,
+      civilStatus: resident.civilStatus,
+      address: resident.address,
+      contactNo: resident.contactNo,
+      occupation: resident.occupation,
+      education: resident.education,
+      residencyStatus: resident.residencyStatus,
+      idPhoto: resident.idPhoto,
+      household: resident.household ? {
+        householdNumber: resident.household.householdNumber,
+        headName: resident.household.headName,
+        address: resident.household.address
+      } : null,
+      documents: resident.documents.map(doc => ({
+        documentNumber: doc.documentNumber,
+        documentType: doc.documentType,
+        issuedDate: doc.issuedDate,
+        purpose: doc.purpose
+      }))
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }

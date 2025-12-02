@@ -23,7 +23,8 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  MoreVertical
+  MoreVertical,
+  QrCode
 } from 'lucide-react'
 import { format } from 'date-fns'
 import Link from 'next/link'
@@ -37,6 +38,9 @@ export default function ResidentsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [selectedResident, setSelectedResident] = useState<any>(null)
   const [showViewModal, setShowViewModal] = useState(false)
+  const [showQRModal, setShowQRModal] = useState(false)
+  const [qrCodeData, setQrCodeData] = useState<string | null>(null)
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null)
   const queryClient = useQueryClient()
 
   const { data: residentsData, isLoading } = useQuery(
@@ -83,6 +87,17 @@ export default function ResidentsPage() {
   const handleViewResident = (resident: any) => {
     setSelectedResident(resident)
     setShowViewModal(true)
+  }
+
+  const handleGenerateQR = async (residentId: string) => {
+    try {
+      const { data } = await api.get(`/residents/${residentId}/qrcode`)
+      setQrCodeData(data.qrCode)
+      setQrCodeUrl(data.qrCodeUrl)
+      setShowQRModal(true)
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to generate QR code')
+    }
   }
 
   const residents = residentsData?.residents || []
@@ -353,6 +368,13 @@ export default function ResidentsPage() {
                             >
                               <Eye className="h-4 w-4" />
                             </button>
+                            <button
+                              onClick={() => handleGenerateQR(resident.id)}
+                              className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                              title="QR Code"
+                            >
+                              <QrCode className="h-4 w-4" />
+                            </button>
                             <Link
                               href={`/residents/${resident.id}/edit`}
                               className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -432,6 +454,13 @@ export default function ResidentsPage() {
                       >
                         <Eye className="h-4 w-4 inline mr-1" />
                         View
+                      </button>
+                      <button
+                        onClick={() => handleGenerateQR(resident.id)}
+                        className="px-3 py-2 text-sm text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+                        title="QR Code"
+                      >
+                        <QrCode className="h-4 w-4 inline" />
                       </button>
                       <Link
                         href={`/residents/${resident.id}/edit`}
@@ -610,6 +639,50 @@ export default function ResidentsPage() {
                   >
                     View Documents
                   </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* QR Code Modal */}
+        {showQRModal && qrCodeData && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">Resident QR Code</h2>
+                <button
+                  onClick={() => {
+                    setShowQRModal(false)
+                    setQrCodeData(null)
+                    setQrCodeUrl(null)
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="p-6 text-center">
+                <img src={qrCodeData} alt="QR Code" className="mx-auto mb-4 w-64 h-64" />
+                <p className="text-sm text-gray-600 mb-2">
+                  Scan this QR code to view resident information
+                </p>
+                {qrCodeUrl && (
+                  <p className="text-xs text-gray-400 font-mono break-all">{qrCodeUrl}</p>
+                )}
+                <div className="mt-4 flex gap-2">
+                  <button
+                    onClick={() => {
+                      const link = document.createElement('a')
+                      link.href = qrCodeData
+                      link.download = 'resident-qrcode.png'
+                      link.click()
+                    }}
+                    className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    <Download className="h-4 w-4 inline mr-2" />
+                    Download QR Code
+                  </button>
                 </div>
               </div>
             </div>

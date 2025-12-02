@@ -21,12 +21,14 @@ import {
   X,
   Shield,
   MessageSquare,
-  User
+  User,
+  UserPlus
 } from 'lucide-react'
 
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/residents', label: 'Residents', icon: Users },
+  { href: '/add-residents', label: 'Add Residents', icon: UserPlus },
   { href: '/households', label: 'Households', icon: Home },
   { href: '/documents', label: 'Documents', icon: FileText },
   { href: '/incidents', label: 'Incidents', icon: AlertCircle },

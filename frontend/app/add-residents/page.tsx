@@ -6,11 +6,11 @@ import { useQuery, useMutation, useQueryClient } from 'react-query'
 import api from '@/lib/api'
 import Layout from '@/components/Layout'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Save, Upload, X, User, UserCircle, Phone, MapPin, Briefcase, GraduationCap, Home, Camera, QrCode, Download } from 'lucide-react'
+import { ArrowLeft, Save, Upload, X, User, UserCircle, Phone, MapPin, Briefcase, GraduationCap, Home, Camera, UserPlus, QrCode, Download } from 'lucide-react'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/store'
 
-export default function NewResidentPage() {
+export default function AddResidentsPage() {
   const router = useRouter()
   const { hydrated } = useAuthStore()
   const queryClient = useQueryClient()
@@ -118,9 +118,30 @@ export default function NewResidentPage() {
         setShowQRModal(true)
       } catch (qrError: any) {
         console.error('Failed to generate QR code:', qrError)
-        // If QR code generation fails, just redirect
-        router.push('/residents')
+        // Still show success, but QR code generation failed
       }
+      
+      // Reset form after successful submission
+      setFormData({
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        suffix: '',
+        dateOfBirth: '',
+        sex: '',
+        civilStatus: '',
+        address: '',
+        contactNo: '',
+        occupation: '',
+        education: '',
+        householdId: '',
+        residencyStatus: 'NEW',
+      })
+      setIdPhotoFile(null)
+      setIdPhotoPreview(null)
+      
+      // Optionally redirect to residents list or stay on page for another entry
+      // router.push('/residents')
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to add resident')
     } finally {
@@ -148,17 +169,17 @@ export default function NewResidentPage() {
           
           <div className="relative flex items-center gap-4">
             <Link
-              href="/residents"
+              href="/dashboard"
               className="p-2 bg-white/10 backdrop-blur-sm hover:bg-white/20 rounded-lg transition-colors border border-white/20"
             >
               <ArrowLeft className="h-5 w-5 text-white" />
             </Link>
             <div className="p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
-              <UserCircle className="h-8 w-8 text-white" />
+              <UserPlus className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white mb-1">Add New Resident</h1>
-              <p className="text-white/90 text-sm">Enter resident information to register in the system</p>
+              <h1 className="text-3xl font-bold text-white mb-1">Add Residents</h1>
+              <p className="text-white/90 text-sm">Register new residents in the barangay system</p>
             </div>
           </div>
         </div>
@@ -473,7 +494,7 @@ export default function NewResidentPage() {
               href="/residents"
               className="px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-semibold"
             >
-              Cancel
+              View Residents
             </Link>
             <button
               type="submit"
@@ -510,7 +531,6 @@ export default function NewResidentPage() {
                     setQrCodeData(null)
                     setQrCodeUrl(null)
                     setNewResidentName('')
-                    router.push('/residents')
                   }}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
@@ -553,11 +573,10 @@ export default function NewResidentPage() {
                       setQrCodeData(null)
                       setQrCodeUrl(null)
                       setNewResidentName('')
-                      router.push('/residents')
                     }}
                     className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
                   >
-                    View Residents
+                    Close
                   </button>
                 </div>
               </div>
@@ -568,6 +587,4 @@ export default function NewResidentPage() {
     </Layout>
   )
 }
-
-
 

@@ -493,3 +493,4 @@ Stop wasting time on manual paperwork. The Barangay Information System automates
 
 
 
+

@@ -46,6 +46,7 @@ model Resident {
   occupation            String?
   education             String?
   idPhoto               String?               @map("id_photo")
+  qrCode                String?               @unique @map("qr_code")
   residencyStatus       ResidencyStatus       @default(NEW) @map("residency_status")
   householdId           String?               @map("household_id")
   isArchived            Boolean               @default(false) @map("is_archived")

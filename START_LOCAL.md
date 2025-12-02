@@ -193,3 +193,4 @@ The frontend logs will show in Terminal 2 where you ran `npm run dev`
 
 See the detailed guide: `docs/LOCAL_SETUP_GUIDE.md`
 
+
